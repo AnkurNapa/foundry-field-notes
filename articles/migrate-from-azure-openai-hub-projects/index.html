@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Migrate from Azure OpenAI and hub projects to Foundry projects | Foundry Field Notes</title><meta name="description" content="Upgrade Azure OpenAI to a Foundry resource and move hub projects to Foundry projects without breaking existing endpoints, API keys or callers."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/migrate-from-azure-openai-hub-projects/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Migrate from Azure OpenAI and hub projects to Foundry projects"><meta property="og:description" content="Upgrade Azure OpenAI to a Foundry resource and move hub projects to Foundry projects without breaking existing endpoints, API keys or callers."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/migrate-from-azure-openai-hub-projects/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/migrate-from-azure-openai-hub-projects.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Migrate from Azure OpenAI and hub projects to Foundry projects</h1> <p class="lede" data-astro-cid-eomsrdgo>Standalone Azure OpenAI resources and hub-based projects do not open in the new Foundry portal. Upgrade the Azure OpenAI resource in place so its endpoint and keys survive, create Foundry projects next to the hub, move what transfers and prove that every existing caller still works.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-3)" data-astro-cid-eomsrdgo>Level 3</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Governance" data-astro-cid-eomsrdgo>Governance</a><a class="pill" href="/foundry-field-notes/articles/?tag=Architecture" data-astro-cid-eomsrdgo>Architecture</a><a class="pill" href="/foundry-field-notes/articles/?tag=Security" data-astro-cid-eomsrdgo>Security</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>Two different migrations hide under one name.</p>
+<ul>
+<li><strong>A standalone Azure OpenAI resource</strong> is upgraded in place. Its <code>kind</code> changes from <code>OpenAI</code> to <code>AIServices</code> and project management is switched on. The resource name, endpoint, API keys, custom domain, network rules, identity settings and existing state (fine-tuning jobs, batch, stored completions) stay as they were. You gain a Foundry project on top. Rollback exists.</li>
+<li><strong>A hub-based project</strong> is not upgraded. You create a new Foundry project on the Foundry resource the hub already uses. Model deployments, data files, fine-tuned models and vector stores carry over. Preview agent state, open-source model deployments and the hub's own access do not.</li>
+</ul>
+<p>The one way to break keys in the first case is to copy Learn's Bicep upgrade sample as it stands. It sets <code>disableLocalAuth: true</code>, which switches API keys off. Keep that property at its current value until every key caller has moved to Entra ID.</p>
+<h2 id="the-symptom">The symptom</h2>
+<p>Harbour Goods built its first support bot two years ago on an Azure OpenAI resource, <code>hg-aoai</code>, called from the order website with an API key. A data science team also has a hub-based project, <code>hg-hub</code>, with a prompt flow and a fine-tuned model. Now the team wants Foundry agents, file search and evaluations. In the new portal neither resource appears. The GA overview explains why: standalone Azure OpenAI resources and hub-based projects are not supported in the new Foundry portal.</p>
+<h2 id="measure-it">Measure it</h2>
+<p>Before changing anything, write down what exists and who calls it.</p>
+<p><strong>1. Resource kinds and upgrade history.</strong></p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="azurecli"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">az</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> cognitiveservices</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> account</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> list</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  --query</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "[].{name:name, kind:kind, rg:resourceGroup, location:location}"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> --output</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> table</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">az</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> cognitiveservices</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> account</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> show</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> --name</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> hg-aoai</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> --resource-group</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> rg-hg-ai</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  --query</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "{kind:kind, previousKind:properties.previousKind, keysOff:properties.disableLocalAuth, subdomain:properties.customSubDomainName, identity:identity.type}"</span></span></code></pre>
+<p><code>kind</code> shows <code>OpenAI</code> for a standalone Azure OpenAI resource and <code>AIServices</code> for a Foundry resource. <code>previousKind: OpenAI</code> appears only on a resource that was already upgraded. Note <code>keysOff</code>. If it is <code>false</code> or empty, something probably uses keys.</p>
+<p><strong>2. Blockers Learn lists for the upgrade.</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Check</th><th>How</th><th>Why it matters</th></tr></thead><tbody><tr><td>Managed identity</td><td><code>identity.type</code> above, or <strong>Identity</strong> in the Azure portal</td><td>Must be on before upgrade.</td></tr><tr><td>Private endpoints</td><td><code>az network private-endpoint-connection list --id &#x3C;resource-id></code></td><td>Portal upgrade is blocked; delete and recreate, or upgrade with Bicep or Terraform.</td></tr><tr><td>Customer-managed keys</td><td><strong>Encryption</strong> in the Azure portal</td><td>Upgrade by request only.</td></tr><tr><td>Your role</td><td><code>az role assignment list --assignee &#x3C;you> --scope &#x3C;resource-group-id></code></td><td>Owner on the subscription or resource group.</td></tr><tr><td>Wildcard RBAC and policy</td><td>Review roles and policies that do not filter on resource kind</td><td>Cognitive Services User gains all Foundry features after upgrade.</td></tr><tr><td>Region</td><td>Learn's region support page</td><td>Agent Service is available in fewer regions than Azure OpenAI.</td></tr></tbody></table>
+<p><strong>3. Callers.</strong> Search every repository and app setting for <code>hg-aoai.openai.azure.com</code>, <code>api-key</code> and <code>AZURE_OPENAI_KEY</code>. Each hit is a caller you will test after the change.</p>
+<p><strong>4. The hub.</strong> In the Foundry (classic) portal, open <code>hg-hub</code>, select <strong>Management center</strong> > <strong>Connected resources</strong> and find the Foundry connection. That is the Foundry resource your new project will sit on. If the hub only connected to Azure OpenAI, you need a Foundry resource first.</p>
+<h2 id="fix-it">Fix it</h2>
+<h3 id="part-a-upgrade-the-azure-openai-resource">Part A: upgrade the Azure OpenAI resource</h3>
+<ol>
+<li>Turn on the system-assigned managed identity if it is off: in the Azure portal, open the resource, select <strong>Identity</strong> and set <strong>System assigned</strong> to <strong>On</strong>.</li>
+<li>Review RBAC before the switch. Learn's table is the one to read twice: Cognitive Services User goes from OpenAI features to all Foundry features; Cognitive Services OpenAI User stays on OpenAI features; any model is deployable unless a model deployment policy says otherwise.</li>
+<li>Upgrade. In the Azure portal, open the resource. On the overview banner "Want to try the latest industry models and Agents?" select <strong>Get Started</strong> and confirm. For a resource with custom network settings, use Bicep as a patch on the existing resource, keeping today's key setting:</li>
+</ol>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="bicep"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">resource</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> foundry </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'Microsoft.CognitiveServices/accounts@2025-06-01'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> = {</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  name: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'hg-aoai'</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"> // existing name</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  location: location</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  identity: {</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    type: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'SystemAssigned'</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  sku: {</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    name: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'S0'</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  kind: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'AIServices'</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"> // was 'OpenAI'</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  properties: {</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    allowProjectManagement: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">true</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    customSubDomainName: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'hg-aoai'</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    disableLocalAuth: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">false</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"> // keep keys working until callers move to Entra ID</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<ol start="4">
+<li>Fix private DNS if you use private endpoints. A Foundry resource answers on three names: <code>{custom-domain}.openai.azure.com</code>, <code>{custom-domain}.services.ai.azure.com</code> and <code>{custom-domain}.cognitiveservices.azure.com</code>. Create a DNS zone or conditional forwarder for each. Then recreate the private endpoint so it gets IP configurations for the two new names.</li>
+<li>Create or open the first project. The portal path creates a default project that can see the previous Azure OpenAI work. Copy its project endpoint from the overview page. Assign <strong>Foundry User</strong> on the project to developers, because Owner and Contributor do not grant agent creation.</li>
+</ol>
+<h3 id="part-b-move-from-the-hub-to-a-foundry-project">Part B: move from the hub to a Foundry project</h3>
+<ol>
+<li>On the Foundry resource from step 4 of the measurements, create a project. In the Azure portal, select <strong>Projects</strong> under <strong>Resource management</strong>, then <strong>New</strong>.</li>
+<li>Recreate connections the hub used, at account level if several projects share them. The Azure portal cannot add connections; use the Foundry portal or Bicep.</li>
+<li>Move agent code. Replace the connection string with the project endpoint and upgrade to <code>azure-ai-projects</code> 2.x, then follow <a href="/foundry-field-notes/articles/call-foundry-from-python/">Call Foundry from Python</a>. Agent threads and messages from the preview do not transfer; recreate the agent in code.</li>
+<li>Keep the hub while it still earns its place. Learn names custom model training on the Azure Machine Learning stack and features without parity in Foundry projects as reasons to keep it. When you do delete the hub, delete the hub resource, never the Foundry resource it was connected to.</li>
+</ol>
+<h2 id="prove-it">Prove it</h2>
+<p>Run the same checks before and after. Every "after" value except the new rows should match "before".</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Check</th><th>Before</th><th>After</th></tr></thead><tbody><tr><td><code>kind</code></td><td><code>OpenAI</code></td><td><code>AIServices</code></td></tr><tr><td><code>previousKind</code></td><td>Not present</td><td><code>OpenAI</code></td></tr><tr><td><code>disableLocalAuth</code></td><td><code>false</code></td><td><code>false</code> (until you choose to turn keys off).</td></tr><tr><td>Endpoint <code>https://hg-aoai.openai.azure.com/</code></td><td>Responds</td><td>Responds, same URL.</td></tr><tr><td>Order website call with the existing key</td><td>HTTP 200</td><td>HTTP 200, no code change.</td></tr><tr><td>Calls with Entra ID tokens</td><td>HTTP 200</td><td>HTTP 200.</td></tr><tr><td>New project endpoint <code>https://hg-aoai.services.ai.azure.com/api/projects/&#x3C;project></code></td><td>Does not exist</td><td>Responds to the Step 3 script in Call Foundry from Python.</td></tr><tr><td>New portal</td><td>Resource not listed</td><td>Project listed with existing deployments.</td></tr><tr><td>Hub project</td><td>Works</td><td>Still works; new project shares deployments, data files, fine-tuned models and vector stores.</td></tr></tbody></table>
+<p>Learn also suggests confirming the upgrade in the Azure Activity Log: filter on write operations named <code>Microsoft.CognitiveServices/accounts/write</code>.</p>
+<h2 id="where-this-breaks">Where this breaks</h2>
+<ul>
+<li><strong>The sample turns keys off.</strong> Covered above. It is worth repeating because it is the only step that breaks an existing caller.</li>
+<li><strong>Rollback is not free.</strong> To roll back you first delete projects, connections and non-OpenAI deployments. Rolling back also counts against a limit of 30 Azure OpenAI resources per subscription per region.</li>
+<li><strong>Resource count.</strong> Upgrading fails at 100 AIServices resources per subscription per region.</li>
+<li><strong>Assistants and classic agents.</strong> The new portal supports the new agents only. Existing assistants and v1 agents stay in the classic portal. Learn lists classic agents as deprecated with retirement on 31 March 2027.</li>
+<li><strong>Feature gaps.</strong> Weights &#x26; Biases configuration is not supported on Foundry resources. Foundry projects are not yet at full parity with hub projects.</li>
+<li><strong>Policy conflicts.</strong> An Azure Policy that pins <code>kind</code> or network settings can block the upgrade. Read the violation, then upgrade through a template that satisfies it.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>This is Migrate from Azure OpenAI and hub projects (ship-3-2) on the <a href="/foundry-field-notes/roadmap/">roadmap</a>. Once callers run on Entra ID, switch keys off with <a href="/foundry-field-notes/articles/keyless-auth-entra-id/">Keyless auth with Entra ID</a>. For the governance side of a wider rollout, read <a href="/foundry-field-notes/articles/control-plane-azure-policy/">Control plane and Azure Policy at scale</a>. The last step on this track is the <a href="/foundry-field-notes/articles/production-readiness-review/">Production readiness review</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>Moving a brewery's recipe system to a new platform has the same rule: the batch sheet the brewhouse prints at five in the morning must not change because the office upgraded something. Brewery A upgrades the AI resource behind its recipe assistant in place, leaves the API key on until the brewhouse tablet app moves to Entra ID. It tests the tablet before and after. The new agent features arrive without anyone on the floor noticing a thing, which is the point.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/upgrade-azure-openai">Upgrade from Azure OpenAI to Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry-classic/how-to/migrate-project">Migrate from hub-based to Foundry projects (classic)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/general-availability">Microsoft Foundry portal general availability overview</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/develop/sdk-overview">Microsoft Foundry SDKs and endpoints</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry-classic/agents/how-to/tools-classic/file-search-upload-files">How to upload files using the file search tool (classic)</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-symptom" data-astro-cid-eomsrdgo>The symptom</a></li><li data-astro-cid-eomsrdgo><a href="#measure-it" data-astro-cid-eomsrdgo>Measure it</a></li><li data-astro-cid-eomsrdgo><a href="#fix-it" data-astro-cid-eomsrdgo>Fix it</a></li><li data-astro-cid-eomsrdgo><a href="#prove-it" data-astro-cid-eomsrdgo>Prove it</a></li><li data-astro-cid-eomsrdgo><a href="#where-this-breaks" data-astro-cid-eomsrdgo>Where this breaks</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: Migrate from Azure OpenAI and hub projects</a></li></ul> </div> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>Next on the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Production readiness review</a></li></ul> </div> </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

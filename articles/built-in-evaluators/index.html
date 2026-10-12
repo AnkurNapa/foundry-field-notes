@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Built-in evaluators: what each one scores and when to use it | Foundry Field Notes</title><meta name="description" content="Choose Microsoft Foundry built-in quality, RAG, agent and safety evaluators, know each one's inputs and scale, then test them on a seeded dataset."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/built-in-evaluators/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Built-in evaluators: what each one scores and when to use it"><meta property="og:description" content="Choose Microsoft Foundry built-in quality, RAG, agent and safety evaluators, know each one's inputs and scale, then test them on a seeded dataset."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/built-in-evaluators/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/built-in-evaluators.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Built-in evaluators: what each one scores and when to use it</h1> <p class="lede" data-astro-cid-eomsrdgo>A working guide to Foundry&#39;s built-in evaluators: quality, RAG, agent and safety, what each one measures, the inputs it needs and its scale. Then prove it on a 24-row Harbour Goods dataset with six planted fabrications and three thin answers.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-2)" data-astro-cid-eomsrdgo>Level 2</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Evaluation" data-astro-cid-eomsrdgo>Evaluation</a><a class="pill" href="/foundry-field-notes/articles/?tag=Safety" data-astro-cid-eomsrdgo>Safety</a><a class="pill" href="/foundry-field-notes/articles/?tag=SDK" data-astro-cid-eomsrdgo>SDK</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>Foundry ships five families of built-in evaluators: general purpose (how the text reads), RAG (does it stick to the source and cover the facts), agent (did it understand, follow its rules and use tools well), risk and safety (harmful content and agent risks) and textual similarity (overlap with a reference answer).</p>
+<p>Pick by failure, not by count. For a support agent that must quote policy correctly, Groundedness and Response Completeness do the heavy lifting. The four content safety evaluators are the floor for anything customer-facing. Many agent evaluators are still in preview, so date every score you keep.</p>
+<p>This step maps to the AI-103 skill area "Plan and manage an Azure AI solution", specifically applying responsible AI instrumentation with evaluators and safety evaluations. It also covers "Evaluate models and apps, including detecting fabrications, relevance, quality and safety".</p>
+<h2 id="what-you-will-build">What you will build</h2>
+<p>A reference you can keep open and one dataset evaluation that proves the evaluators catch what they claim to catch. The dataset is <a href="/foundry-field-notes/samples/built-in-evaluators.jsonl">built-in-evaluators.jsonl</a>: 24 Harbour Goods questions, each with the policy text as <code>context</code>, a pre-written <code>response</code> and a <code>ground_truth</code>. A <code>planted</code> column tells you what is wrong with each row:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>planted</th><th>Rows</th><th>What is wrong.</th></tr></thead><tbody><tr><td>none</td><td>15</td><td>Nothing. The response matches the policy.</td></tr><tr><td>ungrounded</td><td>6</td><td>A made-up fact: 45-day returns, no receipt needed, 2-day Delhi delivery, a 24-month laptop warranty, accidental damage cover, round-the-clock support.</td></tr><tr><td>incomplete</td><td>3</td><td>True but thin: "Bring the item back", "It is quick", "Support is open in the daytime".</td></tr></tbody></table>
+<p>The rows cover returns (7), delivery (7), warranty (6) and support hours (4). The responses are pre-written, so no agent runs and the scores reflect only the evaluators.</p>
+<h2 id="the-evaluators-family-by-family">The evaluators, family by family</h2>
+<p>Names are as Learn lists them in October 2026. The SDK name is <code>builtin.</code> plus the snake-case name, such as <code>builtin.groundedness</code>.</p>
+<h3 id="general-purpose">General purpose</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Evaluator</th><th>Scores</th><th>Needs</th><th>Scale</th></tr></thead><tbody><tr><td>Coherence</td><td>Logical flow and consistency</td><td>query, response, judge model</td><td>1 to 5, pass at 3.</td></tr><tr><td>Fluency</td><td>Grammar and readability</td><td>response, judge model</td><td>1 to 5, pass at 3.</td></tr></tbody></table>
+<p>Hygiene only. Neither tells you whether the answer is true.</p>
+<h3 id="rag">RAG</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Evaluator</th><th>Scores</th><th>Needs</th><th>Scale</th></tr></thead><tbody><tr><td>Groundedness</td><td>Does the response stay inside the context, with nothing invented? This is precision.</td><td>response, context; query optional</td><td>1 to 5, pass at 3.</td></tr><tr><td>Groundedness Pro (preview)</td><td>Strict consistency with the context, using Azure AI Content Safety</td><td>query, response, context; no judge model</td><td>Pass or fail.</td></tr><tr><td>Relevance</td><td>Does the response address the query?</td><td>query, response</td><td>1 to 5, pass at 3.</td></tr><tr><td>Response Completeness (preview)</td><td>Does the response cover the facts in the ground truth? This is recall.</td><td>ground_truth, response</td><td>1 to 5, pass at 3.</td></tr><tr><td>Retrieval</td><td>Are the retrieved chunks relevant to the query?</td><td>query, context</td><td>1 to 5, pass at 3.</td></tr><tr><td>Document Retrieval</td><td>Search quality against labelled relevance judgements</td><td>retrieval_ground_truth, retrieved_documents; no judge model</td><td>Fidelity, NDCG, XDCG, max relevance, holes.</td></tr></tbody></table>
+<p>Learn's own framing is the one to remember: groundedness is precision, completeness is recall. You want both.</p>
+<h3 id="agent">Agent</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Evaluator</th><th>Scores</th><th>Scale</th></tr></thead><tbody><tr><td>Intent Resolution (preview)</td><td>Did the agent identify and address what the user wanted?</td><td>1 to 5, pass at threshold.</td></tr><tr><td>Task Adherence (preview)</td><td>Did the agent follow its instructions, rules and constraints?</td><td>Pass or fail.</td></tr><tr><td>Task Completion (preview)</td><td>Did the agent finish the task with a usable result?</td><td>Pass or fail.</td></tr><tr><td>Customer Satisfaction (preview)</td><td>Helpfulness, completeness, clarity, tone, resolution and adaptability across a conversation</td><td>1 to 5.</td></tr><tr><td>Task Navigation Efficiency</td><td>Did the agent's steps match an expected sequence? Needs expected actions.</td><td>Pass or fail with precision, recall and F1.</td></tr><tr><td>Tool Call Accuracy</td><td>Right tools, right parameters, no waste</td><td>1 to 5, pass at threshold.</td></tr><tr><td>Tool Selection, Tool Input Accuracy, Tool Output Utilization, Tool Call Success</td><td>One aspect of tool use each</td><td>Pass or fail.</td></tr><tr><td>Output Quality (preview)</td><td>Fluency, Coherence, Intent Resolution, Task Adherence, Groundedness and Task Completion in one judge call</td><td>Composite pass or fail.</td></tr><tr><td>Tool Use Quality (preview)</td><td>The five tool evaluators in one judge call</td><td>Composite pass or fail.</td></tr></tbody></table>
+<p>Two warnings from Learn. Tool evaluators and Groundedness have limited support when the conversation includes Azure AI Search, Bing grounding, SharePoint grounding, Code Interpreter, Fabric data agent or web search calls. And the Quality Grader is deprecated on the agent evaluators page and can no longer run, although the overview reference still lists it.</p>
+<h3 id="risk-and-safety">Risk and safety</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Evaluator</th><th>Detects</th><th>Output</th></tr></thead><tbody><tr><td>Violence, Sexual, Self-Harm, Hate and Unfairness</td><td>Harmful content</td><td>Severity 0 to 7. Passes at or below the threshold, default 3.</td></tr><tr><td>Protected Materials</td><td>Copyrighted text such as lyrics or articles</td><td>Pass or fail.</td></tr><tr><td>Indirect Attack (XPIA)</td><td>A response that obeyed instructions hidden in retrieved content</td><td>Pass or fail.</td></tr><tr><td>Code Vulnerability</td><td>Insecure generated code</td><td>Pass or fail.</td></tr><tr><td>Ungrounded Attributes</td><td>Unfounded inferences about a person's emotional state or protected class</td><td>True or false.</td></tr><tr><td>Prohibited Actions (preview), Sensitive Data Leakage (preview)</td><td>Agent-only risks. Agent targets only, not datasets.</td><td>Pass or fail.</td></tr></tbody></table>
+<p>Safety evaluators run on Microsoft-hosted models and do not take a <code>deployment_name</code>. They run only in listed regions. In October 2026 none of those is in India.</p>
+<h3 id="textual-similarity">Textual similarity</h3>
+<p>Similarity, F1 Score, BLEU, GLEU, ROUGE and METEOR compare the response with a ground truth. They suit translation. A correct support answer worded differently scores low.</p>
+<h2 id="before-you-start">Before you start</h2>
+<ul>
+<li>A Foundry project, the <strong>Foundry User</strong> role and a judge model such as gpt-5.4-mini.</li>
+<li>A project in a region that supports risk and safety evaluators, such as Sweden Central or East US 2. Groundedness Pro runs only in East US 2 and Sweden Central.</li>
+<li><code>pip install "azure-ai-projects>=2.2.0" azure-identity</code></li>
+</ul>
+<h2 id="step-1-upload-the-dataset">Step 1: upload the dataset</h2>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> os</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.identity </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DefaultAzureCredential</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects.models </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> TestingCriterionAzureAIEvaluator</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.types.eval_create_params </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DataSourceConfigCustom</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.types.evals.create_eval_jsonl_run_data_source_param </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> (</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    CreateEvalJSONLRunDataSourceParam,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    SourceFileID,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">project_client </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    endpoint</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">os.environ[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"AZURE_AI_PROJECT_ENDPOINT"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    credential</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DefaultAzureCredential(),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">openai_client </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project_client.get_openai_client()</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">judge </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> os.environ[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"AZURE_AI_MODEL_DEPLOYMENT_NAME"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">data_id </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project_client.datasets.upload_file(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hg-builtin-evaluators"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    version</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"1"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    file_path</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"./built-in-evaluators.jsonl"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">).id</span></span></code></pre>
+<h2 id="step-2-pick-the-evaluators">Step 2: pick the evaluators</h2>
+<p>Six evaluators, each mapped to the columns it needs. Every AI-assisted one gets the judge deployment.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">def</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> criterion</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(name, evaluator, mapping, needs_judge</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">True</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D">    # Safety evaluators run on hosted models and take no judge deployment.</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    extra </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"initialization_parameters"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"deployment_name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: judge}} </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">if</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> needs_judge </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">else</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> {}</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">    return</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> TestingCriterionAzureAIEvaluator(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        type</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"azure_ai_evaluator"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">name,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        evaluator_name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">evaluator,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        data_mapping</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">mapping,</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">        **</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">extra,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    )</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">qr </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"query"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.query</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"response"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.response</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">testing_criteria </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> [</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    criterion(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"groundedness"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.groundedness"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">              {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"query"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.query</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"response"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.response</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"context"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.context</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    criterion(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"response_completeness"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.response_completeness"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">              {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ground_truth"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.ground_truth</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"response"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">item.response</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    criterion(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"relevance"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.relevance"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, qr),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    criterion(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"coherence"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.coherence"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, qr),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    criterion(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"violence"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.violence"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, qr, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">needs_judge</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">False</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    criterion(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hate_unfairness"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.hate_unfairness"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, qr, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">needs_judge</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">False</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span></code></pre>
+<h2 id="step-3-create-and-run-the-evaluation">Step 3: create and run the evaluation</h2>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">eval_object </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai_client.evals.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hg-builtin-evaluators"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    data_source_config</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DataSourceConfigCustom(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        type</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"custom"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        item_schema</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"object"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "properties"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "query"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "context"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "response"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "ground_truth"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "planted"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"string"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">            },</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "required"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"query"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"context"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"response"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ground_truth"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        },</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    ),</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    testing_criteria</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">testing_criteria,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">eval_run </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai_client.evals.runs.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    eval_id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">eval_object.id,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hg-builtin-evaluators-run-1"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    data_source</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">CreateEvalJSONLRunDataSourceParam(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        type</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"jsonl"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        source</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">SourceFileID(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">type</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"file_id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">data_id),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    ),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(eval_run.id)</span></span></code></pre>
+<p>Poll with <code>openai_client.evals.runs.retrieve(run_id=..., eval_id=...)</code> until the status is <code>completed</code>, as in <a href="/foundry-field-notes/articles/run-first-evaluation/">Run your first evaluation</a>. Then open the run under <strong>Evaluation</strong> in the portal.</p>
+<h2 id="check-it-worked">Check it worked</h2>
+<p>The <code>planted</code> column is your answer key. In the run details, compare each row's result with it.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Evaluator</th><th>Expected on the 24 rows.</th></tr></thead><tbody><tr><td>groundedness</td><td>Fails the 6 <code>ungrounded</code> rows. Passes the 15 <code>none</code> rows. The 3 <code>incomplete</code> rows say nothing false, so they can pass.</td></tr><tr><td>response_completeness</td><td>Fails the 3 <code>incomplete</code> rows. Most of the 6 <code>ungrounded</code> rows fail too, because a wrong number does not cover the right one.</td></tr><tr><td>relevance</td><td>Passes most rows. All 24 responses are on topic, which is the point: relevance alone cannot catch a fabrication.</td></tr><tr><td>coherence</td><td>Passes most rows, including the fabrications. Fluent nonsense is still fluent.</td></tr><tr><td>violence, hate_unfairness</td><td>24 passes, severity 0 or 1.</td></tr></tbody></table>
+<p>If groundedness passes a planted row, open the reason. A small judge model can miss a wrong number. Rerun with a stronger judge before you build a gate on it.</p>
+<h2 id="where-this-breaks">Where this breaks</h2>
+<ul>
+<li><strong>Parameter name drift.</strong> Learn's agent evaluation pages pass the judge as <code>deployment_name</code>. Some dataset samples use <code>model</code>. If a run errors on initialisation, try the other key.</li>
+<li><strong>Preview churn.</strong> Intent Resolution, Task Adherence, Task Completion, Customer Satisfaction, Response Completeness, Groundedness Pro and the composite evaluators are in preview. Thresholds and prompts can move.</li>
+<li><strong>Composite judge models.</strong> Learn recommends a model from the GPT-5.6 family as judge for Output Quality and Tool Use Quality. Check that one is deployed before you rely on the composites.</li>
+<li><strong>Very short answers.</strong> Learn notes that Coherence and Fluency scores can be unreliable for responses under about 20 tokens. The three <code>incomplete</code> rows are that short on purpose, so read their reasons rather than trusting the number. Both evaluators also support English responses only.</li>
+<li><strong>Missing fields.</strong> Groundedness without <code>context</code> has to infer context from tool calls, which works only for agent targets. On a dataset, map <code>context</code> explicitly.</li>
+<li><strong>Safety evaluator regions.</strong> A project in Central India runs the quality evaluators and errors on the safety ones.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>This is Built-in evaluators (eval-2-1) on the <a href="/foundry-field-notes/roadmap/">roadmap</a>. When the built-ins do not express your definition of good, such as "always quote the order ID back" or "never promise same-day delivery", go to <a href="/foundry-field-notes/articles/custom-evaluators-test-sets/">Custom evaluators and test sets</a>. For the safety side at runtime rather than in testing, read <a href="/foundry-field-notes/articles/prompt-shields-groundedness/">Prompt shields and groundedness</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>Winery A has an assistant that answers trade buyers from its tech sheets: residual sugar, alcohol by volume, closure type, case configuration. A seeded dataset with a few planted errors, such as 13.5 per cent alcohol where the sheet says 12.5, tells the export manager whether groundedness actually catches a wrong number on that kind of document. Relevance will happily pass the wrong figure, because it is on topic. Seed the errors yourself, so you know the answer key before you trust the score.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/built-in-evaluators">Built-in evaluators reference</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/agent-evaluators">Agent evaluators</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/rag-evaluators">Retrieval-Augmented Generation (RAG) evaluators</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/risk-safety-evaluators">Risk and safety evaluators</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/observability/how-to/cloud-evaluation-datasets">Evaluate existing datasets with Microsoft Foundry SDK</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/observability/how-to/cloud-evaluation">Introduction to cloud evaluation with Microsoft Foundry SDK</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-regions-limits-virtual-network">Rate limits, region support and enterprise features for evaluation</a></li>
+<li><a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103">Study guide for Exam AI-103</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#what-you-will-build" data-astro-cid-eomsrdgo>What you will build</a></li><li data-astro-cid-eomsrdgo><a href="#the-evaluators-family-by-family" data-astro-cid-eomsrdgo>The evaluators, family by family</a></li><li data-astro-cid-eomsrdgo><a href="#before-you-start" data-astro-cid-eomsrdgo>Before you start</a></li><li data-astro-cid-eomsrdgo><a href="#step-1-upload-the-dataset" data-astro-cid-eomsrdgo>Step 1: upload the dataset</a></li><li data-astro-cid-eomsrdgo><a href="#step-2-pick-the-evaluators" data-astro-cid-eomsrdgo>Step 2: pick the evaluators</a></li><li data-astro-cid-eomsrdgo><a href="#step-3-create-and-run-the-evaluation" data-astro-cid-eomsrdgo>Step 3: create and run the evaluation</a></li><li data-astro-cid-eomsrdgo><a href="#check-it-worked" data-astro-cid-eomsrdgo>Check it worked</a></li><li data-astro-cid-eomsrdgo><a href="#where-this-breaks" data-astro-cid-eomsrdgo>Where this breaks</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-2" data-astro-cid-eomsrdgo>Level 2: Built-in evaluators</a></li></ul> </div> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>Next on the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: AI red teaming</a></li><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: Monitor in production</a></li><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: Agent optimizer</a></li></ul> </div> </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

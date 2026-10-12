@@ -1,0 +1,209 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Control plane and Azure Policy: govern Foundry across subscriptions | Foundry Field Notes</title><meta name="description" content="Design Foundry governance at estate scale with Azure Policy, Foundry Control Plane compliance, AI Gateway and Entra Agent ID."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/control-plane-azure-policy/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Control plane and Azure Policy: govern Foundry across subscriptions"><meta property="og:description" content="Design Foundry governance at estate scale with Azure Policy, Foundry Control Plane compliance, AI Gateway and Entra Agent ID."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/control-plane-azure-policy/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/control-plane-azure-policy.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Control plane and Azure Policy: govern Foundry across subscriptions</h1> <p class="lede" data-astro-cid-eomsrdgo>A design guide for governing models, agents and tools across many subscriptions: Azure Policy at the management group, guardrail policies in Foundry Control Plane, AI Gateway limits and Entra Agent ID, each doing the job it&#39;s best at.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-4)" data-astro-cid-eomsrdgo>Level 4</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Governance" data-astro-cid-eomsrdgo>Governance</a><a class="pill" href="/foundry-field-notes/articles/?tag=Architecture" data-astro-cid-eomsrdgo>Architecture</a><a class="pill" href="/foundry-field-notes/articles/?tag=Security" data-astro-cid-eomsrdgo>Security</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>No single tool governs a Foundry estate. Four layers each do one job well:</p>
+<ul>
+<li><strong>Azure Policy</strong> decides what may exist. It blocks a model nobody approved, a resource with keys on or a resource open to the internet, before deployment.</li>
+<li><strong>Foundry Control Plane</strong> shows what does exist and whether it behaves. <strong>Operate</strong> gives one inventory of agents, models and tools across projects in a subscription. Its <strong>Compliance</strong> pane sets the minimum guardrail controls a model deployment needs.</li>
+<li><strong>AI Gateway</strong> limits how much each project may use. It also brings custom agents and MCP tools into the same inventory.</li>
+<li><strong>Microsoft Entra Agent ID</strong> governs who each agent is: Conditional Access, owners, sponsors and the tenant-wide list of agent identities.</li>
+</ul>
+<p>The design question isn't which one to use. It's which rule belongs in which layer and at which scope. Then decide who owns the exceptions.</p>
+<h2 id="the-decision">The decision</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Rule</th><th>Best layer</th><th>Why there</th><th>Trade-off</th></tr></thead><tbody><tr><td>Only approved models in production</td><td>Azure Policy: <strong>Foundry model deployments should only use approved models</strong>, Deny, at the production management group</td><td>Evaluated at deployment time, inherited by every subscription</td><td>Someone owns the allow list. A wrong asset ID blocks a legitimate model</td></tr><tr><td>No preview models in production</td><td>Azure Policy: <strong>Foundry model deployments should meet eligibility requirements</strong> with <code>denyPreviewModels</code></td><td>Attribute-based, no list to maintain</td><td>Blocks useful previews in prod. Keep it off in dev</td></tr><tr><td>No API keys</td><td>Azure Policy: <strong>Azure AI Services resources should have key access disabled</strong>, Deny, or the Configure variant with DeployIfNotExists</td><td>Applies to every new resource</td><td>Breaks any tool still using keys</td></tr><tr><td>No public endpoints</td><td>Azure Policy: <strong>Azure AI Services resources should restrict network access</strong> and the Private Link audit policy</td><td>Same, for networking</td><td>Developers need VPN or a jump box</td></tr><tr><td>Minimum safety controls on every deployment</td><td>Foundry Control Plane <strong>Compliance</strong>: guardrail policy</td><td>Speaks guardrail language, supports exceptions per resource group or deployment</td><td>Scoped to a subscription or resource group, set from the Foundry portal</td></tr><tr><td>Token ceilings per team</td><td>AI Gateway token limits per project</td><td>TPM and period quotas, returns 429 or 403</td><td>Needs API Management. Adds a hop</td></tr><tr><td>Which agents exist and who owns them</td><td>Control Plane <strong>Assets</strong> plus Entra admin center <strong>Agent ID</strong></td><td>Cross-project inventory and identity governance</td><td>Guardrails only apply to Foundry Agent Service agents, not other registered agents</td></tr><tr><td>Who can deploy and build</td><td>Azure RBAC with Foundry roles</td><td>Already the access model</td><td>Role sprawl without groups</td></tr></tbody></table>
+<h2 id="reference-design">Reference design</h2>
+<p>Harbour Goods runs three subscriptions under its landing zone: <code>hg-ai-dev</code>, <code>hg-ai-prod-support</code> and <code>hg-ai-prod-catalogue</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Component</th><th>Scope</th><th>Job</th></tr></thead><tbody><tr><td>Management group <code>mg-hg-ai-prod</code></td><td>Both production subscriptions</td><td>Holds the Deny policies so no subscription can opt out</td></tr><tr><td>Management group <code>mg-hg-ai-nonprod</code></td><td><code>hg-ai-dev</code></td><td>Same policies with <strong>Audit</strong> effect, plus approved models wider</td></tr><tr><td>Approved models policy</td><td><code>mg-hg-ai-prod</code></td><td><code>allowedPublishers</code> and <code>allowedAssetIds</code> for the models in use</td></tr><tr><td>Eligibility policy</td><td><code>mg-hg-ai-prod</code></td><td><code>denyPreviewModels</code> set to true</td></tr><tr><td>Key access and network policies</td><td>Both management groups</td><td>Deny in prod, Audit in dev</td></tr><tr><td>Diagnostic logs policy</td><td>Both</td><td><strong>Diagnostic logs in Azure AI services resources should be enabled</strong> so incidents can be reconstructed</td></tr><tr><td>Guardrail policy <code>hg-min-safety</code></td><td>Each production subscription</td><td>Minimum content safety, prompt injection and protected material controls. One exception: the catalogue batch deployment, which never faces customers</td></tr><tr><td>AI Gateway</td><td>One per Foundry resource</td><td>Per-project TPM and daily quotas. Registers the externally hosted returns agent and the shared MCP tools</td></tr><tr><td>Control Plane <strong>Operate</strong></td><td>Each subscription</td><td>Weekly review of <strong>Overview</strong>, <strong>Assets</strong> and <strong>Compliance</strong> by the AI platform owner</td></tr><tr><td>Entra Agent ID</td><td>Tenant</td><td>Owners and sponsors on every agent identity. Conditional Access on the support agent blueprint</td></tr><tr><td>Defender for Cloud and Purview</td><td>Subscriptions and tenant</td><td>Threat alerts on AI workloads, audit and data security posture for prompts and responses</td></tr></tbody></table>
+<p>The approved-models policy matches asset IDs as prefixes. A trailing slash is the difference between one model and a family.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "effect"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"value"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Deny"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> },</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "allowedPublishers"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"value"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"OpenAI"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">] },</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "allowedAssetIds"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "value"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">      "azureml://registries/azure-openai/models/gpt-5.4-mini/"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">      "azureml://registries/azure-openai/models/gpt-5.2/versions/1"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    ]</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>Without the trailing slash, <code>.../models/gpt-5</code> also matches GPT-5.2 and GPT-5.4. With it, only GPT-5 and its versions match.</p>
+<h2 id="questions-to-ask-the-client">Questions to ask the client</h2>
+<ol>
+<li>How many subscriptions run Foundry today? Do production and development sit under different management groups?</li>
+<li>Who approves a new model? How fast must that happen: days or weeks?</li>
+<li>Do any teams still use API keys? Which tools?</li>
+<li>Is any agent registered from outside Foundry, such as one built on another platform? Guardrails don't reach those.</li>
+<li>Do teams need preview models in production? Who can grant that exception?</li>
+<li>Who owns quota and cost per project? Should one team's runaway agent be able to starve another?</li>
+<li>Who is the named owner and sponsor of each agent identity?</li>
+<li>What evidence does internal audit want: policy compliance reports, guardrail assignments, traces, or all three?</li>
+<li>Is API Management already in the estate? In which network?</li>
+</ol>
+<h2 id="review-checklist">Review checklist</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Deny policies sit at the management group, not the subscription.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every policy ran in <strong>Audit</strong> first. The noncompliant list was cleared before switching to <strong>Deny</strong>.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Approved asset IDs use trailing slashes where a single model is intended.</li>
+<li class="task-list-item"><input type="checkbox" disabled> If model router is used, the router and every routed model's publisher are in the allow list.</li>
+<li class="task-list-item"><input type="checkbox" disabled> A guardrail policy exists per production subscription, with written reasons for each exception.</li>
+<li class="task-list-item"><input type="checkbox" disabled> AI Gateway is on for every production resource, with limits per project.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every agent identity has an owner. The Entra <strong>All agent identities</strong> list matches the Control Plane inventory.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Diagnostic logs flow to a central workspace.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Developers know the policies exist. A blocked <strong>Deploy</strong> button names the policy and assignment, so they can find you.</li>
+</ul>
+<h2 id="anti-patterns">Anti-patterns</h2>
+<ul>
+<li><strong>Governing in the portal only.</strong> Control Plane features are available in the Foundry portal only. Keep Azure Policy assignments in infrastructure code so they survive reorganisations.</li>
+<li><strong>One giant allow list.</strong> Approve by publisher where you can and by asset ID where you must.</li>
+<li><strong>Deny on day one.</strong> A new <strong>Deny</strong> assignment takes at least 15 minutes to apply and compliance results can take up to 24 hours. Rolling straight to Deny means the first anyone hears of it is a failed release.</li>
+<li><strong>Treating guardrail policy as a guardrail.</strong> The Compliance policy measures and enforces a minimum. Teams still assign real guardrails to their deployments and agents.</li>
+<li><strong>Deleting policies from Azure Policy when Foundry made them.</strong> Delete a guardrail policy from the Foundry <strong>Compliance</strong> pane. That also removes its Azure Policy assignment.</li>
+<li><strong>Forgetting agents outside Foundry.</strong> A registered custom agent shows up in the inventory, but Foundry guardrails don't apply to it. Govern it at the gateway or in its own platform.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>Policy needs a structure to attach to, which is <a href="/foundry-field-notes/articles/ai-landing-zone/">An AI landing zone</a>. The policies here assume <a href="/foundry-field-notes/articles/keyless-auth-entra-id/">Keyless auth with Entra ID</a> and <a href="/foundry-field-notes/articles/private-networking-foundry/">Private networking for Foundry</a> are done. For release-time controls, see <a href="/foundry-field-notes/articles/evaluation-release-gates/">Evaluation strategy that gates releases</a>. The full track is on the <a href="/foundry-field-notes/roadmap/">roadmap</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>A group with three breweries and one distillery lets each site build its own assistants. Head office sets three rules at the management group: approved models only, no keys and no public endpoints. Each site keeps its own project and token quota, so the distillery's month-end stock reconciliation can't eat the brewhouse's capacity. The weekly look at the agent inventory is how head office learned Brewery A had built a second, unowned copy of the cellar assistant.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/control-plane/overview">What is Microsoft Foundry Control Plane?</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/control-plane/quickstart-create-guardrail-policy">Quickstart: Create a guardrail policy</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/model-deployment-policy">Built-in policies for model deployment in Microsoft Foundry portal</a></li>
+<li><a href="https://learn.microsoft.com/azure/ai-services/policy-reference">Azure Policy built-in policy definitions for Foundry Tools</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/control-plane/how-to-enforce-limits-models">Enforce token limits for models</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/configuration/enable-ai-api-management-gateway-portal">Configure AI Gateway in your Foundry resources</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/concepts/agent-identity">Agent identity concepts in Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/guardrails/guardrails-overview">Guardrails and controls overview in Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/control-plane/how-to-manage-compliance-security">Manage compliance and security in Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ai/ready">AI Ready (Cloud Adoption Framework)</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-decision" data-astro-cid-eomsrdgo>The decision</a></li><li data-astro-cid-eomsrdgo><a href="#reference-design" data-astro-cid-eomsrdgo>Reference design</a></li><li data-astro-cid-eomsrdgo><a href="#questions-to-ask-the-client" data-astro-cid-eomsrdgo>Questions to ask the client</a></li><li data-astro-cid-eomsrdgo><a href="#review-checklist" data-astro-cid-eomsrdgo>Review checklist</a></li><li data-astro-cid-eomsrdgo><a href="#anti-patterns" data-astro-cid-eomsrdgo>Anti-patterns</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Control plane and Azure Policy at scale</a></li></ul> </div>  </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

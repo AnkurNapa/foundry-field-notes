@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Model strategy for an estate: many providers, planned retirements | Foundry Field Notes</title><meta name="description" content="Design a Foundry model estate across OpenAI, Anthropic, Meta, DeepSeek and xAI that survives retirements and avoids lock-in, with a review checklist."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/model-strategy-estate/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Model strategy for an estate: many providers, planned retirements"><meta property="og:description" content="Design a Foundry model estate across OpenAI, Anthropic, Meta, DeepSeek and xAI that survives retirements and avoids lock-in, with a review checklist."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/model-strategy-estate/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/model-strategy-estate.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Model strategy for an estate: many providers, planned retirements</h1> <p class="lede" data-astro-cid-eomsrdgo>Every model in production has a retirement date. Design the estate so swapping a model is a routine, tested change: one register, one call shape, a frozen test set and a migration path per deployment type.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-4)" data-astro-cid-eomsrdgo>Level 4</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Models" data-astro-cid-eomsrdgo>Models</a><a class="pill" href="/foundry-field-notes/articles/?tag=Architecture" data-astro-cid-eomsrdgo>Architecture</a><a class="pill" href="/foundry-field-notes/articles/?tag=Governance" data-astro-cid-eomsrdgo>Governance</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>Treat models like any other dependency with an end-of-life date. In Foundry, every GA model ships with a retirement date. The dates can't be extended. A replacement usually appears about 90 days before retirement on Global Standard. In provisioned regions it is about 30 days. Pay-as-you-go deployments can auto-upgrade. Provisioned, batch and fine-tuned deployments can't.</p>
+<p>An estate that survives this has five things: a register of every deployment with its retirement date, one call shape across providers, a frozen test set per workload, a known migration path per deployment type and a policy that controls which models can be deployed at all. Multi-provider is then a choice you can make per workload, not a rewrite.</p>
+<h2 id="the-decision">The decision</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Decision</th><th>Option A</th><th>Option B</th><th>Choose A when</th><th>Choose B when</th></tr></thead><tbody><tr><td>Providers</td><td>One provider family</td><td>Several providers through Foundry</td><td>Procurement, support and data terms favour one family</td><td>Workloads differ in what they need, or you want a second source.</td></tr><tr><td>Model selection</td><td>Fixed model per workload</td><td>Model router</td><td>You need predictable behaviour and an exact model for audit</td><td>Prompts vary in difficulty and cost matters more than which model answered.</td></tr><tr><td>Hosting terms</td><td>Models sold by Azure</td><td>Models from partners and community</td><td>You want Microsoft support, Microsoft Product Terms and enterprise SLAs</td><td>You need a specialist or open model. Expect provider support and Azure Marketplace billing.</td></tr><tr><td>Capacity</td><td>Standard types</td><td>Provisioned</td><td>Traffic is bursty or still growing</td><td>Volume is steady and latency variance hurts.</td></tr><tr><td>Upgrades</td><td><code>OnceNewDefaultVersionAvailable</code></td><td><code>NoAutoUpgrade</code> with a planned migration</td><td>The workload is tolerant and well tested</td><td>The workload is regulated or its output is parsed by code.</td></tr><tr><td>Customisation</td><td>Prompt and retrieval</td><td>Fine-tuning</td><td>Facts change often</td><td>A narrow task needs a smaller, cheaper model and you can retrain it.</td></tr></tbody></table>
+<p><code>NoAutoUpgrade</code> means the deployment stops working at retirement. It is a deliberate choice to own the migration, not a way to avoid one.</p>
+<h2 id="reference-design">Reference design</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Component</th><th>Job</th></tr></thead><tbody><tr><td>Foundry resource per environment</td><td>Holds deployments, projects, roles and networking for dev, test and production.</td></tr><tr><td>Deployment register</td><td>One row per deployment: workload, model, version, deployment type, retirement date, replacement, owner.</td></tr><tr><td>Azure Policy for model deployment</td><td>Limits which publishers and models can be deployed. Model router honours the same policy for its subset.</td></tr><tr><td>One call shape</td><td>The Responses API through <code>get_openai_client()</code> on the project endpoint, which covers the models Foundry serves directly.</td></tr><tr><td>Frozen test set per workload</td><td>Inputs, ground truth and pass criteria that don't change during a migration.</td></tr><tr><td>Evaluation suite</td><td>The same evaluators run on the old and new model so scores compare.</td></tr><tr><td>Gateway or app-level routing</td><td>Weighted traffic between two deployments for canary rollout. You build this. Foundry doesn't.</td></tr><tr><td>Model router (optional)</td><td>One deployment that picks a model per request, with a subset for approved models.</td></tr><tr><td>Lifecycle signals</td><td>The retirement schedule, the Models API <code>lifecycleStatus</code> field and Azure Service Health alerts routed to the owner.</td></tr><tr><td>Observability</td><td>Continuous evaluation on sampled production traffic and Azure Monitor alerts.</td></tr></tbody></table>
+<p>The sample register <a href="/foundry-field-notes/samples/model-strategy-estate.csv">model-strategy-estate.csv</a> shows the Harbour Goods estate. Dates come from the Learn retirement schedule as of 12 October 2026.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Workload</th><th>Model and version</th><th>Type</th><th>Retires</th><th>Days left</th><th>Suggested replacement</th></tr></thead><tbody><tr><td>exec-summary</td><td><code>claude-haiku-4-5</code> 1</td><td>Global Standard</td><td>15 Nov 2026</td><td>34</td><td>None listed.</td></tr><tr><td>returns-reasoner</td><td><code>o4-mini</code> 2025-04-16</td><td>Global Standard</td><td>19 Nov 2026</td><td>38</td><td><code>gpt-5.6-terra</code>.</td></tr><tr><td>invoice-extract</td><td><code>gpt-5-mini</code> 2025-08-07</td><td>Data Zone Standard</td><td>9 Feb 2027</td><td>120</td><td>None listed.</td></tr><tr><td>catalogue-copy</td><td><code>gpt-4o</code> 2024-11-20</td><td>Global Batch</td><td>14 Apr 2027</td><td>184</td><td><code>gpt-5.1</code>.</td></tr><tr><td>router-default</td><td><code>model-router</code> 2025-11-18</td><td>Global Standard</td><td>20 May 2027</td><td>220</td><td>None listed.</td></tr><tr><td>support-agent</td><td><code>gpt-5.4-mini</code> 2026-03-17</td><td>Global Standard</td><td>21 Sep 2027</td><td>344</td><td>None listed.</td></tr><tr><td>ticket-router</td><td>Fine-tuned <code>gpt-4.1-nano</code> 2025-04-14</td><td>Standard</td><td>14 Oct 2027</td><td>367</td><td>Retrain on a newer base.</td></tr><tr><td>policy-search-embed</td><td><code>text-embedding-3-small</code> 1</td><td>Global Standard</td><td>9 Feb 2028</td><td>485</td><td>None listed.</td></tr></tbody></table>
+<p>Two rows are already inside their last 40 days. The batch row can't auto-upgrade: it needs a side-by-side move. The fine-tuned row has its own clock. Its base model, <code>gpt-4.1-nano</code>, is already deprecated.</p>
+<h2 id="questions-to-ask-the-client">Questions to ask the client</h2>
+<ol>
+<li>Which workloads parse model output in code? Which only show it to a person?</li>
+<li>Where may prompts be processed: anywhere, inside a data zone or inside one geography?</li>
+<li>Which providers can procurement and legal accept for customer data? Who signs the partner terms?</li>
+<li>Who owns each deployment? Who hears about a retirement first?</li>
+<li>Does a test set exist for each workload, with agreed pass criteria? Is production content capture switched on?</li>
+<li>What is the rollback corridor? How long will you keep the old deployment warm?</li>
+<li>Is any workload on provisioned, batch or a fine-tuned model? Those don't auto-upgrade.</li>
+<li>What latency and cost per request does each workload need, measured on your traffic rather than list price?</li>
+<li>Are any partner models on short-notice terms? Fireworks per-token models carry a 15-day retirement notice.</li>
+<li>Is there a reason to pin an exact model for audit, such as regulated advice?</li>
+</ol>
+<h2 id="review-checklist">Review checklist</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Every deployment is in the register with a version, type, retirement date and named owner.</li>
+<li class="task-list-item"><input type="checkbox" disabled> No production deployment retires inside 90 days without a migration ticket open.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Each workload has a frozen test set and a recorded baseline score on the current model.</li>
+<li class="task-list-item"><input type="checkbox" disabled> <code>versionUpgradeOption</code> is set on purpose for every pay-as-you-go deployment.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Provisioned and batch deployments have a side-by-side or in-place plan with target quota confirmed.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Fine-tuned deployments list both training and deployment retirement dates.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Azure Policy limits allowed publishers. Model router's publisher, <code>Microsoft</code>, is on the list if you use it.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Claude deployments needed by model router exist on the same resource with a matching SKU.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Code calls models through one client and one API shape. The deployment name comes from configuration, not a literal.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every response logs the serving model name, input tokens, cached tokens and output tokens.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Retired deployments are deleted after rollout so quota is freed and the count falls.</li>
+</ul>
+<h2 id="anti-patterns">Anti-patterns</h2>
+<ul>
+<li><strong>Learning about a retirement from an outage.</strong> Signals exist. Route them to an owner.</li>
+<li><strong>Treating auto-upgrade as a plan.</strong> The endpoint keeps answering. The JSON shape, tone or tool calls may not.</li>
+<li><strong>Picking on leaderboard rank alone.</strong> Public benchmarks filter candidates. Your test set decides.</li>
+<li><strong>Changing the test set mid-migration.</strong> Old and new scores stop being comparable.</li>
+<li><strong>Hard-coding a model name in twenty files.</strong> Swapping becomes a code change in twenty places.</li>
+<li><strong>One giant subset in model router that nobody reviews.</strong> New models join only if you add them. Retired ones drop out and break old subsets.</li>
+<li><strong>Fine-tuning a deprecated base for a long-lived product.</strong> You inherit its clock and must retrain.</li>
+<li><strong>Zombie deployments.</strong> Old versions left running after a move hold quota and confuse the register.</li>
+<li><strong>Assuming partner models behave like models sold by Azure.</strong> Support, billing and terms differ. Claude models, for example, come in an Anthropic-hosted version and an Azure-hosted version.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>Put the policy layer in place with <a href="/foundry-field-notes/articles/control-plane-azure-policy/">Control plane and Azure Policy at scale</a>. Make the test set a real release gate with <a href="/foundry-field-notes/articles/evaluation-release-gates/">Evaluation strategy that gates releases</a>. For the router itself, see <a href="/foundry-field-notes/articles/model-router/">Model router</a>. The whole Models track is on the <a href="/foundry-field-notes/roadmap/">roadmap</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>A wine group runs five assistants across three wineries: cellar records, lab results, export paperwork, cellar door and sales. Each one is a row in a register with its model, its version and the date that model retires. Six weeks before a date, the owner replays a fixed set of 50 real questions on the replacement. The export paperwork assistant keeps a pinned model, because a customs form can't change format overnight.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/foundry-models/concepts/model-migration">Model migration process</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/concepts/model-retirement-schedule">Model retirement schedule</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview">Overview of Microsoft Foundry Models</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/concepts/model-router">Model router for Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/how-to/model-router">Use model router for Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types">Deployment types for Microsoft Foundry Models</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/fine-tuning/overview">Fine-tuning in Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/quickstarts/get-started-code">Quickstart: Get started with Microsoft Foundry SDK</a>.</li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-decision" data-astro-cid-eomsrdgo>The decision</a></li><li data-astro-cid-eomsrdgo><a href="#reference-design" data-astro-cid-eomsrdgo>Reference design</a></li><li data-astro-cid-eomsrdgo><a href="#questions-to-ask-the-client" data-astro-cid-eomsrdgo>Questions to ask the client</a></li><li data-astro-cid-eomsrdgo><a href="#review-checklist" data-astro-cid-eomsrdgo>Review checklist</a></li><li data-astro-cid-eomsrdgo><a href="#anti-patterns" data-astro-cid-eomsrdgo>Anti-patterns</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Model strategy for an estate</a></li></ul> </div>  </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

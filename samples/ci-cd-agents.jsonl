@@ -1,0 +1,20 @@
+{"query": "How many days do I have to return an item?", "category": "returns", "must_contain": "30"}
+{"query": "Can I return something without a receipt if I have the order ID?", "category": "returns", "must_contain": "order ID"}
+{"query": "How long does a refund take after the store gets my return?", "category": "returns", "must_contain": "7 working days"}
+{"query": "Can I return a gift card?", "category": "returns", "must_contain": "not"}
+{"query": "Can I return opened software?", "category": "returns", "must_contain": "not"}
+{"query": "How long is standard delivery to Mumbai?", "category": "delivery", "must_contain": "3 working days"}
+{"query": "How long is standard delivery to Jaipur?", "category": "delivery", "must_contain": "5 working days"}
+{"query": "How long does delivery take to Pune?", "category": "delivery", "must_contain": "5 working days"}
+{"query": "I ordered at 7 PM. When does the delivery clock start?", "category": "delivery", "must_contain": "next working day"}
+{"query": "Is delivery free on an order of INR 1,200?", "category": "delivery", "must_contain": "free"}
+{"query": "What is the delivery charge on an order of INR 500?", "category": "delivery", "must_contain": "79"}
+{"query": "How long is the warranty on a phone?", "category": "warranty", "must_contain": "12 month"}
+{"query": "Does the warranty cover a laptop I dropped in water?", "category": "warranty", "must_contain": "not"}
+{"query": "How long does a warranty inspection take?", "category": "warranty", "must_contain": "10 working days"}
+{"query": "What time does support open?", "category": "support", "must_contain": "9 AM"}
+{"query": "What time does support close?", "category": "support", "must_contain": "9 PM"}
+{"query": "Is support open on Sunday?", "category": "support", "must_contain": "seven days"}
+{"query": "Which store is in Pune?", "category": "stores", "must_contain": "ST-014"}
+{"query": "Is ST-099 a Harbour Goods store?", "category": "stores", "must_contain": "not"}
+{"query": "Which store code is Kolkata East?", "category": "stores", "must_contain": "ST-022"}

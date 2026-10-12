@@ -1,0 +1,265 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AI red teaming: attack your own agent before customers do | Foundry Field Notes</title><meta name="description" content="Run the Microsoft Foundry AI Red Teaming Agent in the cloud against an agent, read attack success rate, fix failures and rerun to prove the fix."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/ai-red-teaming/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="AI red teaming: attack your own agent before customers do"><meta property="og:description" content="Run the Microsoft Foundry AI Red Teaming Agent in the cloud against an agent, read attack success rate, fix failures and rerun to prove the fix."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/ai-red-teaming/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/ai-red-teaming.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>AI red teaming: attack your own agent before customers do</h1> <p class="lede" data-astro-cid-eomsrdgo>Three hand-written attack prompts are not a red team. Use the AI Red Teaming Agent in the cloud to attack the Harbour Goods support agent with generated prompts, encoded attacks and indirect injection, read the attack success rate, fix what breaks and rerun the same scan to prove it.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-3)" data-astro-cid-eomsrdgo>Level 3</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Safety" data-astro-cid-eomsrdgo>Safety</a><a class="pill" href="/foundry-field-notes/articles/?tag=Evaluation" data-astro-cid-eomsrdgo>Evaluation</a><a class="pill" href="/foundry-field-notes/articles/?tag=Security" data-astro-cid-eomsrdgo>Security</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>The AI Red Teaming Agent uses Microsoft's open-source PyRIT framework and Foundry's risk and safety evaluators to attack your model or agent automatically. It generates adversarial prompts, disguises them with attack strategies such as Base64, character flipping or instructions hidden in tool output, sends them to the target and scores each reply. The headline number is the <strong>attack success rate</strong> (ASR): successful attacks divided by total attacks.</p>
+<p>Run it in the cloud for agents. Agent-only risks, which are prohibited actions, sensitive data leakage and task adherence, exist only in cloud red teaming, because the cloud run provides a minimal sandbox. The local scanner is in preview and Learn says it is not compatible with the new Foundry portal and SDK. Treat ASR like any judge score: a model decides whether each attack succeeded, so review the hits before you act on them.</p>
+<p>This step maps to the AI-103 skill area "Plan and manage an Azure AI solution", specifically implementing responsible AI with safety evaluations and governing agent behaviour with constraints and tool-access controls.</p>
+<h2 id="the-symptom">The symptom</h2>
+<p>The Harbour Goods support agent passed the three adversarial rows in the <a href="/foundry-field-notes/articles/custom-evaluators-test-sets/">custom test set</a>. It refused to print its instructions, refused to invent a refund code and refused to read out another customer's phone number. Then someone on the support team typed the same request in Base64 and the agent decoded it helpfully.</p>
+<p>Three hand-written attacks test three doors. Attackers try hundreds, in encodings, in other languages, across several turns and hidden inside documents the agent retrieves. You need a way to try them at scale and count how many get through.</p>
+<h2 id="measure-it">Measure it</h2>
+<h3 id="what-can-be-attacked">What can be attacked</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Risk category</th><th>Targets</th><th>Where it runs.</th></tr></thead><tbody><tr><td>Hateful and unfair, sexual, violent, self-harm content</td><td>Models and agents</td><td>Local and cloud.</td></tr><tr><td>Protected materials, code vulnerability, ungrounded attributes</td><td>Models and agents</td><td>Local and cloud.</td></tr><tr><td>Prohibited actions</td><td>Agents only</td><td>Cloud only</td></tr><tr><td>Sensitive data leakage</td><td>Agents only</td><td>Cloud only</td></tr><tr><td>Task adherence</td><td>Agents only</td><td>Cloud only</td></tr></tbody></table>
+<p>Supported targets for cloud runs are Foundry project deployments, Azure OpenAI deployments and Foundry prompt and container agents. Agents that call Azure tools are supported. Function tool calls, browser automation, connected agents, computer use, workflow agents and non-Foundry agents are not, as of October 2026.</p>
+<h3 id="where-to-run-it">Where to run it</h3>
+<p>Cloud red teaming runs in a short list of regions. Learn's red teaming concept page lists East US 2, France Central, Sweden Central, Switzerland West and North Central US. The evaluation limits page lists only East US 2 and North Central US. Use East US 2 or North Central US to be safe. Run in a <strong>purple environment</strong>: a non-production project with production-like resources. When the target is a Foundry agent, the run is transient, so harmful prompts are not logged by the Agent Service and are redacted from the results.</p>
+<h3 id="set-up-the-red-team">Set up the red team</h3>
+<p>You need the <strong>Foundry User</strong> role, Python 3.10 or later and the agent's name and version. This is Learn's cloud sample, pointed at the Harbour Goods agent.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">pip</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "azure-ai-projects>=2.0.0"</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> azure-identity</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> os</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.identity </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DefaultAzureCredential</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects.models </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> (</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    AzureAIAgentTarget,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    AgentTaxonomyInput,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    EvaluationTaxonomy,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    RiskCategory,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">endpoint </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> os.environ[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"AZURE_AI_PROJECT_ENDPOINT"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">judge </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> os.environ[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"AZURE_AI_MODEL_DEPLOYMENT_NAME"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">agent_name </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "harbour-goods-support"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">agent_version </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "3"</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"> # the version under test</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">project_client </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">endpoint</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">endpoint, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">credential</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DefaultAzureCredential())</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">client </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project_client.get_openai_client()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">red_team </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> client.evals.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hg-support-red-team"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    data_source_config</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"azure_ai_source"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"scenario"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"red_team"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    testing_criteria</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">[</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"azure_ai_evaluator"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Prohibited Actions"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">         "evaluator_name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.prohibited_actions"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"evaluator_version"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"1"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"azure_ai_evaluator"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Task Adherence"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">         "evaluator_name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.task_adherence"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"evaluator_version"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"1"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">         "initialization_parameters"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"deployment_name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: judge}},</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"azure_ai_evaluator"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Sensitive Data Leakage"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">         "evaluator_name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"builtin.sensitive_data_leakage"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"evaluator_version"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"1"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    ],</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">target </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AzureAIAgentTarget(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">agent_name, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">version</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">agent_version)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">taxonomy </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project_client.beta.evaluation_taxonomies.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">agent_name,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    body</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">EvaluationTaxonomy(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        description</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Harbour Goods support agent red team"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        taxonomy_input</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">AgentTaxonomyInput(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">            risk_categories</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">[RiskCategory.</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">PROHIBITED_ACTIONS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">            target</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">target,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        ),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    ),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span></code></pre>
+<p>The taxonomy is a generated list of prohibited, high-risk and irreversible actions for this agent and its tools. Review it before you run anything. Learn's disclaimer is clear that the default taxonomy is illustrative guidance, not a legal list. It recommends you keep the defaults derived from regulation. For Harbour Goods, add the actions only a person may take: issuing refunds, cancelling orders and sharing any customer's contact details.</p>
+<h3 id="run-the-attack">Run the attack</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> time</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">run </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> client.evals.runs.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    eval_id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">red_team.id,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hg-red-team-baseline"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    data_source</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"azure_ai_red_team"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "item_generation_params"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"red_team_taxonomy"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "attack_strategies"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Flip"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Base64"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"IndirectJailbreak"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "num_turns"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">5</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "source"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"file_id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: taxonomy.id},</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        },</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "target"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: target.as_dict(),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    },</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">while</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> run.status </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">not</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"completed"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"failed"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"canceled"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    time.sleep(</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">5</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    run </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> client.evals.runs.retrieve(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">run_id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">run.id, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">eval_id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">red_team.id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">items </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> list</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(client.evals.runs.output_items.list(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">run_id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">run.id, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">eval_id</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">red_team.id))</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(run.status, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">len</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(items))</span></span></code></pre>
+<p><code>attack_strategies</code> takes any of the PyRIT strategies Learn lists, from simple encodings such as <code>ROT13</code>, <code>Leetspeak</code> and <code>Morse</code> to <code>Jailbreak</code>, <code>Crescendo</code> and multi-turn attacks. <code>num_turns</code> sets how deep each generated conversation goes.</p>
+<h3 id="read-the-result">Read the result</h3>
+<p>For each risk category, count the attacks and the successes, then work out ASR:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>How to get it.</th></tr></thead><tbody><tr><td>Total attacks</td><td>Output items for the category.</td></tr><tr><td>Successful attacks</td><td>Items where the evaluator marked the target's behaviour as failing.</td></tr><tr><td>ASR</td><td>Successful attacks divided by total attacks.</td></tr><tr><td>Worst strategy</td><td>The attack strategy with the most successes.</td></tr></tbody></table>
+<p>Then open every successful attack. A success can be a real hole or a judge being strict. Learn warns that ASR comes from generative models, can be non-deterministic and can include false positives.</p>
+<h2 id="fix-it">Fix it</h2>
+<p>Match each kind of failure to a fix in the right layer. Instructions are the weakest layer, so do not stop there.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>What got through</th><th>Fix</th><th>Where</th></tr></thead><tbody><tr><td>Encoded requests decoded and answered</td><td>Content filters and a blocklist on the deployment, plus Prompt Shields.</td><td><a href="/foundry-field-notes/articles/content-filters-blocklists/">Content filters and blocklists</a>, <a href="/foundry-field-notes/articles/prompt-shields-groundedness/">Prompt shields and groundedness</a></td></tr><tr><td>Instructions hidden in a retrieved document obeyed</td><td>Prompt Shields for indirect attacks and cleaner source documents.</td><td><a href="/foundry-field-notes/articles/prompt-shields-groundedness/">Prompt shields and groundedness</a></td></tr><tr><td>A prohibited action attempted, such as a refund</td><td>Remove the tool or require human approval before it runs.</td><td><a href="/foundry-field-notes/articles/long-running-agents-human-approval/">Long-running agents and human approval</a></td></tr><tr><td>Data from another customer exposed</td><td>Narrow what the agent's identity can read.</td><td><a href="/foundry-field-notes/articles/agent-identity/">Agent identity</a></td></tr><tr><td>Drifted off task under pressure</td><td>Tighter instructions with explicit refusal wording, then a new agent version.</td><td>Agent instructions</td></tr></tbody></table>
+<p>Save each fix as a new agent version. Never change the version you measured, or the comparison is meaningless.</p>
+<h2 id="prove-it">Prove it</h2>
+<p>Rerun with the same taxonomy, the same attack strategies and the same <code>num_turns</code>, against the new version. Change one thing at a time, then compare ASR per category.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Risk category</th><th>Version 3 attacks</th><th>Version 3 successes</th><th>Version 3 ASR</th><th>Version 4 attacks</th><th>Version 4 successes</th><th>Version 4 ASR.</th></tr></thead><tbody><tr><td>Prohibited actions</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Sensitive data leakage</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Task adherence</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>
+<p>The arithmetic, as an illustration rather than a measured result: 60 attacks with 9 successes is an ASR of 15 per cent. If the fixed version lets 2 of 60 through, ASR is 3.3 per cent. With samples that small, read every success in both runs before you claim the drop. Agree the target with the business before the run, not after, such as "no successful prohibited action at all".</p>
+<p>Once the fix holds, schedule the scan. The agent's <strong>Monitor</strong> settings include <strong>Red team scans (preview)</strong>, where you pick an evaluation template and set a schedule. Results then show on the same dashboard as quality and cost.</p>
+<h2 id="where-this-breaks">Where this breaks</h2>
+<ul>
+<li><strong>Synthetic, single-turn, English.</strong> Sensitive data leakage and prohibited actions testing use synthetic data and mock tools, are single-turn and English-only. A clean run is evidence, not a guarantee.</li>
+<li><strong>Tool coverage.</strong> An agent that relies on function tools cannot be red teamed for tool behaviour today. Test those paths by hand.</li>
+<li><strong>Region drift.</strong> Two Learn pages give different region lists. Check both before you build a project for this.</li>
+<li><strong>Local scanner.</strong> <code>azure-ai-evaluation[redteam]</code> is in preview, needs Python 3.10 to 3.13 and does not work with the new Foundry portal and SDK.</li>
+<li><strong>It is not a pen test.</strong> Learn recommends pairing automated scans with human red teamers who bring creativity the generator lacks.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>This is AI red teaming (eval-3-1) on the <a href="/foundry-field-notes/roadmap/">roadmap</a>. Next, <a href="/foundry-field-notes/articles/monitor-in-production/">Monitor in production</a> puts scheduled red team scans next to quality, safety and cost on one dashboard. For how red team results feed a go or no-go decision, see <a href="/foundry-field-notes/articles/evaluation-release-gates/">Evaluation strategy that gates releases</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>Distillery A gives its bonded warehouse assistant a tool that can move a cask's status from "maturing" to "ready for bottling". That is an irreversible action with duty consequences, so it belongs in the prohibited or high-risk list of the red team taxonomy. A red team run tries to talk the assistant into flipping the status through a disguised instruction pasted into a cask note. If any attempt succeeds, the fix is a human approval step on that tool, not a firmer sentence in the prompt.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/ai-red-teaming-agent">AI Red Teaming Agent</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/develop/run-ai-red-teaming-cloud">Run AI Red Teaming Agent in the cloud</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/develop/run-scans-ai-red-teaming-agent">Run AI Red Teaming Agent locally (preview)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/risk-safety-evaluators">Risk and safety evaluators</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-regions-limits-virtual-network">Rate limits, region support and enterprise features for evaluation</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/observability/how-to/how-to-monitor-agents-dashboard">Monitor agents with the Agent Monitoring Dashboard</a></li>
+<li><a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103">Study guide for Exam AI-103</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-symptom" data-astro-cid-eomsrdgo>The symptom</a></li><li data-astro-cid-eomsrdgo><a href="#measure-it" data-astro-cid-eomsrdgo>Measure it</a></li><li data-astro-cid-eomsrdgo><a href="#fix-it" data-astro-cid-eomsrdgo>Fix it</a></li><li data-astro-cid-eomsrdgo><a href="#prove-it" data-astro-cid-eomsrdgo>Prove it</a></li><li data-astro-cid-eomsrdgo><a href="#where-this-breaks" data-astro-cid-eomsrdgo>Where this breaks</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: AI red teaming</a></li></ul> </div> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>Next on the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Evaluation strategy that gates releases</a></li></ul> </div> </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

@@ -1,0 +1,220 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Evaluation strategy that gates releases | Foundry Field Notes</title><meta name="description" content="Design Microsoft Foundry evaluation release gates: blocking and advisory checks, baseline comparison, red teaming, CI and production monitoring."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/evaluation-release-gates/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Evaluation strategy that gates releases"><meta property="og:description" content="Design Microsoft Foundry evaluation release gates: blocking and advisory checks, baseline comparison, red teaming, CI and production monitoring."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/evaluation-release-gates/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/evaluation-release-gates.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Evaluation strategy that gates releases</h1> <p class="lede" data-astro-cid-eomsrdgo>A design guide for turning Foundry evaluations into a release gate the business trusts: which checks block, which only warn, how to compare a candidate with the live version fairly, where red teaming and production monitoring fit and the questions to settle with the client before the first gate runs.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-4)" data-astro-cid-eomsrdgo>Level 4</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Evaluation" data-astro-cid-eomsrdgo>Evaluation</a><a class="pill" href="/foundry-field-notes/articles/?tag=CI%2FCD" data-astro-cid-eomsrdgo>CI/CD</a><a class="pill" href="/foundry-field-notes/articles/?tag=Governance" data-astro-cid-eomsrdgo>Governance</a><a class="pill" href="/foundry-field-notes/articles/?tag=Architecture" data-astro-cid-eomsrdgo>Architecture</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>A release gate is a promise written down before the release: this agent version goes live only if these measurements come back within these limits. The tooling in Foundry is enough to build one. Versioned datasets hold the test sets, built-in and custom evaluators score them, the AI Red Teaming Agent attacks the candidate, the GitHub Action for agent evaluations (preview) runs it all in CI with confidence intervals and the comparison view tests whether a change is real. What the tooling cannot give you is agreement. The business has to sign off what "good" means and which failures stop a release, before anyone sees a score.</p>
+<p>Design the gate in three tiers. Hard rules block on a single failure. Quality must not regress against the live version, judged with a significance test rather than a raw average. Everything else is advisory and goes in the release note. Then keep measuring after launch, because the gate only covers the questions you thought of.</p>
+<h2 id="the-decision">The decision</h2>
+<p>Most teams start with one number and a threshold. That breaks in two ways: small test sets make the number noisy. An average also hides the one row that matters. Choose a gate style per check, not one for the whole agent.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Gate style</th><th>How it decides</th><th>Strengths</th><th>Weaknesses</th><th>Use it for.</th></tr></thead><tbody><tr><td>Zero-tolerance hard rule</td><td>Any single failure blocks</td><td>Easy to explain. No statistics needed.</td><td>Needs a deterministic or near-deterministic check</td><td>Banned promises, adversarial rows, prohibited actions, safety severity above threshold.</td></tr><tr><td>Absolute threshold</td><td>Pass rate at or above a fixed line</td><td>Simple. Learn's own example is an 85 per cent task adherence pass rate.</td><td>Noisy on small sets. Encourages moving the line after a bad run.</td><td>A mature agent with a large test set.</td></tr><tr><td>Non-regression against the live version</td><td>Candidate compared with baseline using a t-test</td><td>Fair to hard test sets. Catches quiet regressions.</td><td>Needs enough rows. Small sets come back Inconclusive.</td><td>Quality evaluators on every release.</td></tr><tr><td>Human review sample</td><td>A named person reads a fixed sample</td><td>Catches what judges miss. The business trusts it.</td><td>Slow and expensive. Does not scale.</td><td>High-risk agents and the first few releases.</td></tr><tr><td>Advisory only</td><td>Reported, never blocks</td><td>No false alarms</td><td>Easy to ignore</td><td>Fluency, coherence, token cost per response.</td></tr></tbody></table>
+<p>Two Foundry facts shape the choice. LLM judges are non-deterministic, so a judge-scored gate needs either a margin or a significance test. And the comparison view and the GitHub Action both report statistical significance, so you do not have to build that yourself.</p>
+<h2 id="reference-design">Reference design</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Component</th><th>Foundry piece</th><th>Job in the gate.</th></tr></thead><tbody><tr><td>Golden test set</td><td>Versioned project dataset, for example the 30-row Harbour Goods set from <a href="/foundry-field-notes/articles/custom-evaluators-test-sets/">Custom evaluators and test sets</a></td><td>Fixed questions with expected behaviour. Changes only through review, with a version bump.</td></tr><tr><td>Growing test set</td><td>Datasets generated from traces</td><td>Adds real production questions, especially ones that failed, after a person checks them.</td></tr><tr><td>Hard-rule graders</td><td>Code-based custom evaluators (preview), Azure OpenAI <code>string_check</code> graders</td><td>Deterministic checks for promises the business never makes.</td></tr><tr><td>Quality evaluators</td><td>Groundedness, Response Completeness, Intent Resolution, Task Adherence, rubric evaluators</td><td>Judge-scored quality, compared with the live version.</td></tr><tr><td>Safety evaluators</td><td>Violence, Sexual, Self-Harm, Hate and Unfairness, Indirect Attack</td><td>Severity checks. Run only in supported regions.</td></tr><tr><td>Adversarial testing</td><td>AI Red Teaming Agent in the cloud</td><td>Attack success rate per risk category before release.</td></tr><tr><td>CI runner</td><td>GitHub Action <code>microsoft/ai-agent-evals</code> (preview), signed in with OpenID Connect</td><td>Runs the evaluators on a candidate <code>agent-name:version</code> against a baseline and writes a report with confidence intervals.</td></tr><tr><td>Version control</td><td>Agent versions</td><td>Every candidate is a new version. The live version is the baseline.</td></tr><tr><td>Comparison</td><td><strong>Evaluation</strong> > select runs > <strong>Compare</strong></td><td>Baseline comparison with t-test colouring, from ImprovedStrong to DegradedStrong.</td></tr><tr><td>Production check</td><td>Continuous evaluation, scheduled evaluation, red team scans and alerts on the <strong>Monitor</strong> tab, all preview</td><td>Confirms the gate's verdict on live traffic and catches drift.</td></tr><tr><td>Evidence</td><td>Evaluation runs and reports in the project, traces in Application Insights</td><td>The audit trail behind each go or no-go.</td></tr></tbody></table>
+<h3 id="the-three-tiers-for-harbour-goods">The three tiers for Harbour Goods</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Tier</th><th>Check</th><th>Rule</th></tr></thead><tbody><tr><td>1, blocks</td><td><code>hg_policy_phrases</code> on the 12 edge and adversarial rows</td><td>Every row passes.</td></tr><tr><td>1, blocks</td><td>Violence, Self-Harm, Hate and Unfairness on the full set</td><td>No row above severity 3.</td></tr><tr><td>1, blocks</td><td>Red team: prohibited actions and sensitive data leakage</td><td>No successful attack that a person confirms as real.</td></tr><tr><td>2, blocks on regression</td><td>Groundedness, Response Completeness, Task Adherence</td><td>No DegradedStrong or DegradedWeak result against the live version.</td></tr><tr><td>3, advisory</td><td>Coherence, Fluency, output tokens per response</td><td>Reported in the release note.</td></tr></tbody></table>
+<p>The tier 1 rules are written so they can be checked without statistics. Tier 2 uses the significance test so a hard test set does not punish a good change. Tier 3 informs. A product owner decides.</p>
+<h3 id="cadence">Cadence</h3>
+<p>Learn's advice for the GitHub Action is not to evaluate on every commit, to keep cost down. A workable rhythm is the tier 1 checks on every pull request that changes instructions, tools or model, the full gate on release candidates and red teaming before each release and on a schedule after it.</p>
+<h2 id="questions-to-ask-the-client">Questions to ask the client</h2>
+<ol>
+<li>Which wrong answers would make the news, or a regulator call? Those become tier 1 rules.</li>
+<li>Who owns the definition of a correct answer for returns, delivery and warranty? Who signs off a change to the golden test set?</li>
+<li>What is the live version's pass rate today? Without a baseline, the first gate has nothing to compare against.</li>
+<li>Where must evaluation data live? In October 2026, risk and safety evaluators do not run in Indian regions. A team bound to Central India needs a decision on where safety scoring happens.</li>
+<li>Who reads the red team hits and confirms which are real? Learn warns that attack success rate can include false positives.</li>
+<li>What does a gate failure trigger: a blocked deploy, a person's review or only a warning?</li>
+<li>Which model is the judge? Who approves changing it? A new judge changes every score.</li>
+<li>What may be logged? Evaluation reports and traces can hold customer text.</li>
+<li>What is the evaluation budget per release, counted in judge calls and red team runs?</li>
+</ol>
+<h2 id="review-checklist">Review checklist</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Tier 1 rules are written down and signed by the business owner.</li>
+<li class="task-list-item"><input type="checkbox" disabled> The golden test set is a versioned dataset with edge and adversarial rows, not only typical questions.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every evaluator is listed with its preview or GA status and the date it was last checked.</li>
+<li class="task-list-item"><input type="checkbox" disabled> The judge model and version are fixed for the life of a baseline.</li>
+<li class="task-list-item"><input type="checkbox" disabled> The live version's evaluation run is stored as the baseline.</li>
+<li class="task-list-item"><input type="checkbox" disabled> CI signs in to Azure with OpenID Connect, not stored keys.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Safety evaluators and red teaming run in a supported region. Data residency is agreed.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Red team taxonomy is reviewed by a person and includes the company's own prohibited actions.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Optimizer or prompt-tuning results are checked on a held-out set before they reach the gate.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Continuous evaluation, scheduled evaluation and alerts are on for the live version.</li>
+<li class="task-list-item"><input type="checkbox" disabled> The gate's own cost per release is known.</li>
+</ul>
+<h2 id="anti-patterns">Anti-patterns</h2>
+<p><strong>The single blended score.</strong> An average of eight evaluators can rise while the one that matters falls. Report each evaluator separately and gate on the ones the business named.</p>
+<p><strong>Moving the line.</strong> Lowering a threshold after a failed run turns the gate into a formality. Changes to rules go through the same sign-off as changes to the agent.</p>
+<p><strong>Testing on the training set.</strong> If the <a href="/foundry-field-notes/articles/agent-optimizer/">agent optimizer</a> or a prompt engineer tuned against a dataset, that dataset cannot also be the gate.</p>
+<p><strong>Swapping the judge mid-stream.</strong> A new judge model shifts every score. Rebaseline on purpose, never by accident.</p>
+<p><strong>Gate at launch, silence after.</strong> The gate covers questions you thought of. Production brings the rest. Without continuous evaluation, the first sign of drift is a complaint.</p>
+<p><strong>Every commit, every evaluator.</strong> It is slow, expensive and teaches people to ignore red builds. Match the depth of the check to the size of the change.</p>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>This is Evaluation strategy that gates releases (eval-4-1) on the <a href="/foundry-field-notes/roadmap/">roadmap</a>. The pipeline mechanics are in <a href="/foundry-field-notes/articles/ci-cd-agents/">CI/CD for agents</a>. The wider go-live decision that this gate feeds into is <a href="/foundry-field-notes/articles/production-readiness-review/">Production readiness review</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>Brewery A already runs release gates, just not for software. A batch does not leave the brewery until the lab signs off alcohol, carbonation and a taste panel, with hard limits on some checks and a panel's judgement on others. An AI assistant for the brewery deserves the same shape: hard limits on the answers that could cause harm, such as cleaning chemical concentrations, a comparison with the last approved version for the rest and a named person who signs. The QA manager already knows how to run that. The new part is only the test set.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/observability">Observability in generative AI</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/observability/how-to/evaluate-agent">Evaluate your AI agents</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/evaluation-github-action">How to run an evaluation in GitHub Action (preview)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/evaluate-results">View evaluation results in the Microsoft Foundry portal</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/built-in-evaluators">Built-in evaluators reference</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/custom-evaluators">Custom evaluators (preview)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-evaluators/azure-openai-graders">Azure OpenAI graders</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/ai-red-teaming-agent">AI Red Teaming Agent</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/observability/how-to/how-to-monitor-agents-dashboard">Monitor agents with the Agent Monitoring Dashboard</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/evaluation-regions-limits-virtual-network">Rate limits, region support and enterprise features for evaluation</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-decision" data-astro-cid-eomsrdgo>The decision</a></li><li data-astro-cid-eomsrdgo><a href="#reference-design" data-astro-cid-eomsrdgo>Reference design</a></li><li data-astro-cid-eomsrdgo><a href="#questions-to-ask-the-client" data-astro-cid-eomsrdgo>Questions to ask the client</a></li><li data-astro-cid-eomsrdgo><a href="#review-checklist" data-astro-cid-eomsrdgo>Review checklist</a></li><li data-astro-cid-eomsrdgo><a href="#anti-patterns" data-astro-cid-eomsrdgo>Anti-patterns</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Evaluation strategy that gates releases</a></li></ul> </div>  </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

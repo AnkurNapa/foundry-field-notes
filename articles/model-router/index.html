@@ -1,0 +1,196 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Model router: one deployment that picks a model for each request | Foundry Field Notes</title><meta name="description" content="Deploy Foundry model router, choose a routing mode and model subset, then log which underlying model served each request and compare the mix."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/model-router/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Model router: one deployment that picks a model for each request"><meta property="og:description" content="Deploy Foundry model router, choose a routing mode and model subset, then log which underlying model served each request and compare the mix."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/model-router/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/model-router.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Model router: one deployment that picks a model for each request</h1> <p class="lede" data-astro-cid-eomsrdgo>Deploy model router once and it sends each prompt to a suitable model from OpenAI, Anthropic, xAI, DeepSeek, Meta and others. Then read which model served each request and check the mix.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-2)" data-astro-cid-eomsrdgo>Level 2</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Models" data-astro-cid-eomsrdgo>Models</a><a class="pill" href="/foundry-field-notes/articles/?tag=Cost" data-astro-cid-eomsrdgo>Cost</a><a class="pill" href="/foundry-field-notes/articles/?tag=Observability" data-astro-cid-eomsrdgo>Observability</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>Model router is a trained language model that you deploy like any other model. It reads each prompt and passes it to the underlying model it judges most suitable. Easy questions go to small, cheap models. Hard ones go to larger or reasoning models. Your code calls one deployment name. The response tells you which model actually answered, in its <code>model</code> field.</p>
+<p>The current version is <code>2025-11-18</code>. In October 2026 it routes across 35 models and is GA, with a retirement date of 20 May 2027.</p>
+<p>This step covers the AI-103 skill area <strong>Implement generative AI and agentic solutions</strong>, in particular orchestrating multiple models. It also touches cost footprints in <strong>Plan and manage an Azure AI solution</strong>.</p>
+<h2 id="what-you-will-build">What you will build</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Piece</th><th>Value</th></tr></thead><tbody><tr><td>Deployment</td><td><code>hg-router</code>, model <code>model-router</code> version <code>2025-11-18</code>, Global Standard.</td></tr><tr><td>Routing mode</td><td>Balanced first, then Cost for comparison.</td></tr><tr><td>Model subset</td><td>Optional: a short list of approved models.</td></tr><tr><td>Test prompts</td><td><a href="/foundry-field-notes/samples/model-router.jsonl">model-router.jsonl</a>: 24 Harbour Goods prompts, 12 labelled <code>simple</code> and 12 <code>complex</code>.</td></tr><tr><td>Output</td><td>A count of which model served each label.</td></tr></tbody></table>
+<h2 id="before-you-start">Before you start</h2>
+<ul>
+<li>A Foundry resource in a supported region. In October 2026 model router runs in 32 regions. South India supports both Global Standard and Data Zone Standard.</li>
+<li>The <strong>Foundry User</strong> role on the project to call it. You also need rights to create deployments.</li>
+<li>Python with <code>azure-ai-projects</code> 2.x and <code>azure-identity</code>.</li>
+<li>If your organisation uses the built-in Azure Policy for model deployment, its allowed publishers must include <code>Microsoft</code> (the publisher of model router) plus the publisher of every model you route to.</li>
+</ul>
+<h2 id="step-1-learn-the-three-routing-modes">Step 1: learn the three routing modes</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Mode</th><th>What it does</th><th>Fits</th></tr></thead><tbody><tr><td>Balanced (default)</td><td>Considers every model within a small quality band of the best model for the prompt, around 1 to 2 percent. Then it picks the cheapest</td><td>Most workloads.</td></tr><tr><td>Cost</td><td>Widens the band to around 5 to 6 percent, then picks the cheapest</td><td>High-volume, simple work such as classification.</td></tr><tr><td>Quality</td><td>Picks the highest-rated model for the prompt and ignores cost</td><td>Complex reasoning or critical output.</td></tr></tbody></table>
+<p>The router doesn't store your prompts. It honours data zone boundaries and only routes to models your access and deployment types allow.</p>
+<h2 id="step-2-deploy-model-router">Step 2: deploy model router</h2>
+<p>In the portal:</p>
+<ol>
+<li>Sign in to <a href="https://ai.azure.com">Microsoft Foundry</a> with the <strong>New Foundry</strong> toggle on.</li>
+<li>Open the model catalogue and find <code>model-router</code>. Select it.</li>
+<li>For the defaults, choose <strong>Default settings</strong>. That gives Balanced mode across the full model set.</li>
+<li>For control, choose <strong>Custom settings</strong>. Use the <strong>Routing mode</strong> dropdown to pick a mode. Select <strong>Route to a subset of models</strong> and tick the models you allow.</li>
+</ol>
+<p>Mode and subset changes can take up to five minutes to apply.</p>
+<p>Or deploy with the management REST API. Sign in with the Azure CLI first.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">export</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AZURE_AI_AUTH_TOKEN</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">az</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> account</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> get-access-token</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> --resource</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> https://management.azure.com</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> --query</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> accessToken</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> tsv</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> -X</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> PUT</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "https://management.azure.com/subscriptions/&#x3C;subscription-id>/resourceGroups/hg-foundry-dev-rg/providers/Microsoft.CognitiveServices/accounts/hg-foundry-dev/deployments/hg-router?api-version=2025-10-01-preview"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    -H</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "Content-Type: application/json"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    -H</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "Authorization: Bearer </span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">$AZURE_AI_AUTH_TOKEN</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> \</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    -d</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> '{</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "sku": {"name": "GlobalStandard", "capacity": 10},</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "properties": {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "model": {"format": "OpenAI", "name": "model-router", "version": "2025-11-18"}</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        }</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">    }'</span></span></code></pre>
+<p>You don't deploy the underlying OpenAI, xAI, DeepSeek or Meta models yourself. Claude models are the exception. To route to <code>claude-sonnet-5</code> or any other Claude model, deploy it from the catalogue to the same resource first, with a matching SKU. Otherwise the subset request fails with <code>InvalidResourceProperties</code>.</p>
+<p>Set one content filter and one TPM limit on the router deployment. They apply to everything that passes through it. Don't set them per underlying model.</p>
+<h2 id="step-3-send-the-test-prompts-and-record-the-serving-model">Step 3: send the test prompts and record the serving model</h2>
+<p>Save this as <code>route.py</code>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> json</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> collections </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> Counter</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.identity </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DefaultAzureCredential</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">PROJECT_ENDPOINT</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "https://hg-foundry-dev.services.ai.azure.com/api/projects/support-agent"</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">ROUTER</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "hg-router"</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">project </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">endpoint</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">PROJECT_ENDPOINT</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">credential</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DefaultAzureCredential())</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">openai </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project.get_openai_client()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">served </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"simple"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: Counter(), </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"complex"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: Counter()}</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">tokens </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"simple"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"complex"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">with</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> open</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"model-router.jsonl"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">as</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> f:</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">    for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> line </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> f:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        item </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> json.loads(line)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        response </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.responses.create(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">model</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">ROUTER</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">input</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">item[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"prompt"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">])</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        served[item[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"label"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]][response.model] </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">+=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 1</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        tokens[item[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"label"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]] </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">+=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> response.usage.input_tokens </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">+</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> response.usage.output_tokens</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">        print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">item[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"label"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">:8</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> {</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">response.model</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">:40</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> {</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">item[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"prompt"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">][:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">50</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> label, counts </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> served.items():</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(label, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">dict</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(counts), </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"tokens:"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, tokens[label])</span></span></code></pre>
+<p><code>response.model</code> holds the model that served the request, with its version, for example <code>gpt-5-mini-2025-08-07</code>. That field is the whole point. Log it on every call in production too.</p>
+<h2 id="step-4-switch-the-mode-and-run-again">Step 4: switch the mode and run again</h2>
+<p>Change the routing mode to <strong>Cost</strong> on the deployment. Wait five minutes. Run <code>route.py</code> again. Then try <strong>Quality</strong>.</p>
+<p>Compare the three runs side by side:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Mode</th><th>Simple prompts: models used</th><th>Complex prompts: models used</th><th>Total tokens</th></tr></thead><tbody><tr><td>Balanced</td><td>From your run</td><td>From your run</td><td>From your run.</td></tr><tr><td>Cost</td><td>From your run</td><td>From your run</td><td>From your run.</td></tr><tr><td>Quality</td><td>From your run</td><td>From your run</td><td>From your run.</td></tr></tbody></table>
+<p>Read the answers to the complex prompts, not just the counts. The refund sum in the file has one right answer. The policy questions have rules the reply must keep.</p>
+<h2 id="check-it-worked">Check it worked</h2>
+<ul>
+<li>All 24 prompts return an answer. None fails for context length.</li>
+<li>Every row prints a <code>model</code> value that isn't <code>model-router</code>. That is the underlying model.</li>
+<li>The <code>simple</code> group mostly lands on smaller models and the <code>complex</code> group spreads to larger or reasoning models. If both groups land on the same model, the router judged them alike. That is a finding, not a fault.</li>
+<li>In the playground, open the router deployment and send a prompt. Each response shows which underlying model was selected.</li>
+</ul>
+<h2 id="where-this-breaks">Where this breaks</h2>
+<ul>
+<li><strong>Context window.</strong> The router's context limit is the smallest underlying model's limit. A long prompt only succeeds if it happens to land on a bigger model. Use a model subset of large-context models when prompts are long.</li>
+<li><strong>Ignored parameters.</strong> If the router picks a reasoning model, <code>temperature</code> and <code>top_p</code> are ignored. <code>reasoning_effort</code> is honoured in version <code>2025-11-18</code>.</li>
+<li><strong>Routing reads text only.</strong> Images are accepted, but the decision uses the text. Audio input isn't supported.</li>
+<li><strong>Subsets and failover.</strong> Failover is on by default. With a custom subset, the subset is also the fallback set, so pick at least two models.</li>
+<li><strong>New models don't join a subset.</strong> They are excluded until you add them. In October 2026 the pool gained <code>gpt-6-astra</code>, <code>claude-opus-5</code>, <code>claude-sonnet-5</code>, <code>claude-fable-5-1</code>, <code>grok-4.6</code> and three Fireworks models. If you use a subset, review it monthly.</li>
+<li><strong>Retired models leave the pool.</strong> August 2026 removed <code>gpt-5-chat</code>, <code>gpt-5.2-chat</code>, <code>gpt-5.3-chat</code>, <code>DeepSeek-V3.1</code> and <code>claude-opus-4.1</code>. Old subsets that named them need editing.</li>
+<li><strong>Caching varies.</strong> Prompt caching works when the same underlying model handles consecutive requests. Session affinity (preview) can keep Chat Completions turns on one model, but it is best effort.</li>
+<li><strong>Quota.</strong> A Tier 1 subscription gets 1,000 RPM and 1,000,000 TPM for the router on Global Standard.</li>
+<li><strong>Billing.</strong> Router cost is the sum of what the underlying models cost. The pricing page also lists a rate for the router's input prompts. Filter Cost analysis in the Azure portal by the <strong>Deployment</strong> tag to see it.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>Before you send real traffic, compare the router with your current single model on the same test set, as in <a href="/foundry-field-notes/articles/choose-model-from-catalogue/">Choose a model from the catalogue</a>. For production monitoring, see <a href="/foundry-field-notes/articles/monitor-in-production/">Monitor in production</a>. For where the router fits in a multi-provider plan, read <a href="/foundry-field-notes/articles/model-strategy-estate/">Model strategy for an estate</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>A winery's assistant gets two kinds of question. Most are lookups: which tank holds the Shiraz, what the last sugar reading was. A few need thought, such as whether a slow ferment in tank 7 needs a nutrient addition today. Winery A puts one router deployment behind the assistant. The lookups go to a small model and cost little. The tank 7 question goes to a larger one. The log shows which.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/concepts/model-router">Model router for Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/how-to/model-router">Use model router for Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/foundry-models/whats-new-model-router">What's new in model router in Microsoft Foundry Models</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/concepts/model-retirement-schedule">Model retirement schedule</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/quotas-limits">Azure OpenAI in Microsoft Foundry Models quotas and limits</a>.</li>
+<li><a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103">Study guide for Exam AI-103</a>.</li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#what-you-will-build" data-astro-cid-eomsrdgo>What you will build</a></li><li data-astro-cid-eomsrdgo><a href="#before-you-start" data-astro-cid-eomsrdgo>Before you start</a></li><li data-astro-cid-eomsrdgo><a href="#step-1-learn-the-three-routing-modes" data-astro-cid-eomsrdgo>Step 1: learn the three routing modes</a></li><li data-astro-cid-eomsrdgo><a href="#step-2-deploy-model-router" data-astro-cid-eomsrdgo>Step 2: deploy model router</a></li><li data-astro-cid-eomsrdgo><a href="#step-3-send-the-test-prompts-and-record-the-serving-model" data-astro-cid-eomsrdgo>Step 3: send the test prompts and record the serving model</a></li><li data-astro-cid-eomsrdgo><a href="#step-4-switch-the-mode-and-run-again" data-astro-cid-eomsrdgo>Step 4: switch the mode and run again</a></li><li data-astro-cid-eomsrdgo><a href="#check-it-worked" data-astro-cid-eomsrdgo>Check it worked</a></li><li data-astro-cid-eomsrdgo><a href="#where-this-breaks" data-astro-cid-eomsrdgo>Where this breaks</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-2" data-astro-cid-eomsrdgo>Level 2: Model router</a></li></ul> </div> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>Next on the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: Fine-tuning and distillation</a></li><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: Latency, throughput and caching</a></li></ul> </div> </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

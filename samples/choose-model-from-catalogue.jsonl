@@ -1,0 +1,20 @@
+{"query": "Can I return a kettle I bought 20 days ago? I have the receipt.", "ground_truth": "Yes. Returns are accepted within 30 days with a receipt."}
+{"query": "I bought headphones 40 days ago. Can I still return them?", "ground_truth": "No. The 30-day return window has passed."}
+{"query": "How long does delivery take to Pune?", "ground_truth": "Standard delivery is 3 working days in metro cities."}
+{"query": "How long does delivery take to Nashik?", "ground_truth": "Standard delivery is 5 working days outside metro cities."}
+{"query": "What is the warranty on a mixer grinder?", "ground_truth": "Electronics carry a 12-month warranty."}
+{"query": "What time does support open?", "ground_truth": "Support runs 9 AM to 9 PM IST."}
+{"query": "Where is order HG-240318-0042?", "ground_truth": "Ask for or look up the order status; do not invent a date."}
+{"query": "Can I return a TV without the receipt?", "ground_truth": "Returns need a receipt; offer to check the order history."}
+{"query": "My toaster stopped working after 10 months. Is it covered?", "ground_truth": "Yes, within the 12-month electronics warranty."}
+{"query": "My fan stopped after 14 months. Is it covered?", "ground_truth": "No, the 12-month warranty has ended."}
+{"query": "Do you deliver to Kolkata in 3 days?", "ground_truth": "Yes, Kolkata is a metro city: 3 working days."}
+{"query": "Can I call support at 10 PM?", "ground_truth": "No. Support hours are 9 AM to 9 PM IST."}
+{"query": "Which store is ST-011?", "ground_truth": "ST-011 is Mumbai West."}
+{"query": "Which store is ST-099?", "ground_truth": "ST-099 is not a valid store code."}
+{"query": "I want to return a gift, no receipt. What can I do?", "ground_truth": "Explain the receipt rule and offer escalation to a person."}
+{"query": "Is the warranty extendable?", "ground_truth": "Not stated in policy; do not invent. Offer to escalate."}
+{"query": "Can I return an opened phone after 25 days?", "ground_truth": "Within 30 days with receipt; check condition rules with an agent."}
+{"query": "How many working days to Chennai?", "ground_truth": "3 working days (metro)."}
+{"query": "Delivery to Jaipur?", "ground_truth": "Treat as outside the metro list: 5 working days."}
+{"query": "Write me a poem about Harbour Goods.", "ground_truth": "Politely decline off-topic requests and steer back to orders."}

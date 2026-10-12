@@ -1,0 +1,4 @@
+file,VendorName,InvoiceId,InvoiceDate,DueDate,PurchaseOrder,ShipToStore,LineItemCount,SubTotal,TotalTax,TotalAmount,Currency
+extract-structure-content-understanding-invoice-1.pdf,Tamarind Lane Traders,TLT-2026-0918,2026-09-18,2026-10-18,PO-HG-260911-003,ST-003,3,73020.00,13143.60,86163.60,INR
+extract-structure-content-understanding-invoice-2.pdf,Bluegate Electricals,BGE/26-27/0441,2026-09-22,2026-10-22,PO-HG-260915-014,ST-014,4,138195.00,24875.10,163070.10,INR
+extract-structure-content-understanding-invoice-3.pdf,Monsoon Pack Co.,MPC-7781,2026-09-25,2026-10-25,PO-HG-260920-007,ST-099,2,32050.00,5769.00,37819.00,INR

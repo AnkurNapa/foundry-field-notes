@@ -1,0 +1,38 @@
+Route the Harbour Goods support message to one queue: returns, delivery, warranty, billing, store, escalate. Reply with the queue name only.
+
+Examples:
+Message: I want to send back the kettle, it is faulty
+Queue: returns
+
+Message: Return request for kettle, bought 5 days ago
+Queue: returns
+
+Message: Where is my kettle? It was due 5 days ago
+Queue: delivery
+
+Message: Courier did not come for the kettle
+Queue: delivery
+
+Message: The kettle stopped working after 5 months
+Queue: warranty
+
+Message: Is my kettle still under warranty?
+Queue: warranty
+
+Message: I was charged twice for the kettle
+Queue: billing
+
+Message: Invoice for the kettle shows the wrong GST
+Queue: billing
+
+Message: Is the kettle in stock at ST-011?
+Queue: store
+
+Message: What time does ST-003 close?
+Queue: store
+
+Message: This is the third time I am writing about the kettle
+Queue: escalate
+
+Message: I will go to consumer court over the kettle
+Queue: escalate

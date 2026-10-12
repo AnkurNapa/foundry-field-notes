@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Agent architecture: one agent, many agents or plain code | Foundry Field Notes</title><meta name="description" content="Decide between plain code, one agent and many agents on Foundry Agent Service, with a trade-off table, reference design and review checklist."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/agent-architecture/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Agent architecture: one agent, many agents or plain code"><meta property="og:description" content="Decide between plain code, one agent and many agents on Foundry Agent Service, with a trade-off table, reference design and review checklist."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/agent-architecture/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/agent-architecture.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Agent architecture: one agent, many agents or plain code</h1> <p class="lede" data-astro-cid-eomsrdgo>A design guide for deciding between plain code, a single model call, one agent with tools and several agents, then choosing prompt, hosted or Responses API for each. With a reference design for the Harbour Goods support estate, client questions, a review checklist and the anti-patterns that cost the most.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-4)" data-astro-cid-eomsrdgo>Level 4</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Architecture" data-astro-cid-eomsrdgo>Architecture</a><a class="pill" href="/foundry-field-notes/articles/?tag=Agents" data-astro-cid-eomsrdgo>Agents</a><a class="pill" href="/foundry-field-notes/articles/?tag=Governance" data-astro-cid-eomsrdgo>Governance</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>Use the least machinery that works. The Azure Architecture Center ranks the options as levels of complexity and says to "use the lowest level of complexity that reliably meets your requirements". The Cloud Adoption Framework adds a step before that: if the task doesn't need generative AI, use code or a non-generative model.</p>
+<p>So the order of questions is:</p>
+<ol>
+<li>Can deterministic code do it? Then write code.</li>
+<li>Can one model call with a good prompt do it? Then make one call.</li>
+<li>Does it need to choose between tools at run time? Then one agent with tools. This is "often the right default for enterprise use cases".</li>
+<li>Only then, several agents. Start there only when a security or compliance boundary, separate owning teams or a known roadmap of distinct functions demands it.</li>
+</ol>
+<p>A separate decision follows for each agent: prompt agent, hosted agent or the Responses API from your own app. And a third: which steps need a person to approve.</p>
+<h2 id="the-decision">The decision</h2>
+<h3 id="how-many-agents">How many agents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Option</th><th>Use when</th><th>Costs you</th><th>Fails like</th></tr></thead><tbody><tr><td>Plain code</td><td>The rule is known and stable: ST-099 isn't a valid store, refunds over INR 10,000 need approval</td><td>Developer time</td><td>Rarely. When it does, a stack trace says where</td></tr><tr><td>Direct model call</td><td>Single-step language tasks: classify, summarise, translate, extract</td><td>Tokens for one call</td><td>Confident nonsense, but only once per request</td></tr><tr><td>One agent with tools</td><td>Varied questions in one domain, where some need a lookup or a calculation</td><td>Tokens for each loop, plus tool charges</td><td>Wrong tool, wrong arguments, loops. Learn advises iteration limits</td></tr><tr><td>Several agents</td><td>Separate security boundaries, separate teams, or more than three to five distinct functions</td><td>Every hand-off adds latency, prompts to maintain, monitoring and credentials</td><td>Coordination failures, context bloat, blame that's hard to place</td></tr></tbody></table>
+<h3 id="how-to-build-each-agent">How to build each agent</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Route</th><th>Choose when</th><th>Watch</th></tr></thead><tbody><tr><td>Prompt agent</td><td>Configuration is enough: model, instructions, built-in tools, a toolbox</td><td>No custom code. Versions are immutable and <strong>Always use latest</strong> ships every save</td></tr><tr><td>Hosted agent</td><td>The agent must run your own code, use a custom protocol or control compute</td><td>Container cost per active session. One version serves 100 per cent of traffic; no splitting</td></tr><tr><td>Responses API from your app</td><td>The agent is part of an app you already run and nothing else calls it</td><td>No managed endpoint for other callers. Still governed if you call the project endpoint</td></tr></tbody></table>
+<h3 id="where-people-sit-in-the-loop">Where people sit in the loop</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Pattern</th><th>Use for</th><th>Built with</th></tr></thead><tbody><tr><td>No approval</td><td>Read-only lookups</td><td>Tool with <code>approval_mode="never_require"</code></td></tr><tr><td>Approve the tool call</td><td>Single irreversible actions: issue a refund, create a return</td><td>Tool approval in Agent Framework, or <code>require_approval="always"</code> on a toolbox tool enforced by your runtime</td></tr><tr><td>Approve and wait</td><td>Decisions that take hours or days</td><td><code>@multi_turn_task</code> on a long-running hosted agent (preview)</td></tr><tr><td>Review between agents</td><td>A draft that a person edits before the next agent sees it</td><td><code>.with_request_info()</code> in a sequential workflow</td></tr></tbody></table>
+<h2 id="reference-design">Reference design</h2>
+<p>The Harbour Goods support estate after a year of growth. Each row is a component and its one job.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Component</th><th>Job</th><th>Foundry piece</th></tr></thead><tbody><tr><td>Store code and refund rules</td><td>Validate store codes, route refunds by amount and age</td><td>Plain Python inside the hosted agent's tools. No model involved</td></tr><tr><td>Customer support agent</td><td>Answer order, delivery, returns and warranty questions</td><td>Prompt agent with file search over the policy pack</td></tr><tr><td>Order tools</td><td>Order status, order history</td><td>MCP server on Azure Functions, exposed through a toolbox</td></tr><tr><td>Returns tools</td><td>Create a return</td><td>Second MCP server in the same toolbox, approval required</td></tr><tr><td>Refund agent</td><td>Nightly refund batch, manager approval over INR 10,000</td><td>Hosted agent with resilient background responses and multi-turn tasks (preview)</td></tr><tr><td>Store operations agent</td><td>Managers' questions about their store's orders</td><td>Prompt agent sharing the same toolbox, scoped by identity</td></tr><tr><td>Toolbox</td><td>One governed endpoint, central credentials, versioned tools</td><td><code>hg-support-tools</code>, consumer endpoint only</td></tr><tr><td>Agent identities</td><td>Least-privilege access to each downstream system</td><td>One Entra identity per agent</td></tr><tr><td>Channels</td><td>Customers on the web, staff in Teams</td><td>Web app calls the support agent endpoint; staff agents published to Teams</td></tr><tr><td>Release control</td><td>Test, pin, promote</td><td>Agent versions, active version pinned, toolbox default version promoted after tests</td></tr><tr><td>Observability</td><td>See every model and tool call</td><td>Tracing and Application Insights per project</td></tr></tbody></table>
+<p>Note what's missing: a "master" orchestrator agent. The support agent and the refund agent don't talk to each other. They share tools, not conversations. That's one agent per job, which is not the same as a multi-agent system.</p>
+<h2 id="questions-to-ask-the-client">Questions to ask the client</h2>
+<ul>
+<li>Which of these decisions is already written down as a rule? Every written rule is code, not a prompt.</li>
+<li>What is the worst thing the agent could do if it were wrong? Who would notice? How fast?</li>
+<li>Which actions can't be undone? Each one needs an approval and an idempotency key.</li>
+<li>Does any data have to stay inside a boundary another part of the system mustn't cross? That's the strongest reason for a second agent.</li>
+<li>How many teams will own parts of this? One team, one agent is a reasonable default.</li>
+<li>Where do users already work: a website, Teams, Microsoft 365 Copilot or a phone line?</li>
+<li>Can any data leave the Azure compliance boundary? This decides web search and some third-party MCP servers.</li>
+<li>Who approves a new version? What evidence do they need?</li>
+<li>What does a refund, a ticket or an answer cost today without the agent? Without that number, nobody can say whether the agent is worth it.</li>
+</ul>
+<h2 id="review-checklist">Review checklist</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Each agent has one job that fits in one sentence.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every rule that can be code is code.</li>
+<li class="task-list-item"><input type="checkbox" disabled> A second agent exists only because of a boundary, an owning team or a growth plan. The reason is written down.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Tool calls have iteration limits.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every irreversible tool requires approval. The runtime enforces it. The toolbox endpoint doesn't.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Every irreversible action carries an idempotency key.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Agents connect to the toolbox consumer endpoint, not a version-specific one.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Published agents have a pinned active version, not <strong>Always use latest</strong>.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Each agent has its own identity with least-privilege roles.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Nothing new is built on the portal workflow designer, which retires on 1 December 2026.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Long-running work uses <code>resilient_background=True</code> where crashes matter. The crash path has been tested.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Tracing is on and someone reads it.</li>
+<li class="task-list-item"><input type="checkbox" disabled> Evaluations gate version changes.</li>
+</ul>
+<h2 id="anti-patterns">Anti-patterns</h2>
+<ul>
+<li><strong>The agent for everything.</strong> One agent with forty tools and a two-page prompt. Tool selection degrades as the list grows. Split by job, or use toolbox tool search (preview) to keep the visible list short.</li>
+<li><strong>The agent zoo.</strong> Five agents where one would do, because the diagram looked better. Every hand-off adds latency and another prompt to maintain.</li>
+<li><strong>A model doing arithmetic.</strong> Refund thresholds, date maths and store code checks in a prompt. Write the function.</li>
+<li><strong>Trusting the approval flag.</strong> <code>require_approval="always"</code> on a toolbox tool that the runtime never checks. The tool runs.</li>
+<li><strong>Shipping from the playground.</strong> <strong>Always use latest</strong> on a published agent means an unfinished save reaches customers.</li>
+<li><strong>Portal workflows for new builds.</strong> The designer is in preview and retiring on 1 December 2026. Use Agent Framework.</li>
+<li><strong>Canary releases on one hosted agent.</strong> Traffic splitting between versions isn't supported. Use a second agent for the canary.</li>
+<li><strong>Background mode mistaken for resilience.</strong> Background work continues after the request returns. It doesn't survive the process dying without the resilient opt-in.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>The building blocks are in <a href="/foundry-field-notes/articles/toolboxes-mcp-servers/">Toolboxes and MCP servers</a>, <a href="/foundry-field-notes/articles/hosted-agents-agent-framework/">Hosted agents with Agent Framework</a> and <a href="/foundry-field-notes/articles/multi-agent-workflows/">Multi-agent workflows</a>. Take the design to a go or no-go meeting with <a href="/foundry-field-notes/articles/production-readiness-review/">Production readiness review</a>. Govern it at scale with <a href="/foundry-field-notes/articles/control-plane-azure-policy/">Control plane and Azure Policy at scale</a>. The full track is on the <a href="/foundry-field-notes/roadmap/">roadmap</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>Brewery A asks for "an AI for the brewhouse". On inspection, half of it is rules: a mash temperature outside the recipe range is an alarm, not a conversation. That's plain code reading the brewhouse controller. The question "why did FV-03 finish two points high?" needs judgement across the brew log, the yeast record and the cellar temperatures. That's one agent with three tools. The quality lab's results sit behind a separate access boundary, so the lab gets its own agent that answers only lab questions. Three components, one of them an agent with a real reason to be separate.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/architecture/ai-ml/guide/ai-agent-design-patterns">AI agent orchestration patterns</a></li>
+<li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ai-agents/single-agent-multiple-agents">Single agent or multiple agents</a></li>
+<li><a href="https://learn.microsoft.com/agents/architecture/multi-agent-workflow-oriented">Workflow-oriented multi-agent patterns</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/overview">Agents in Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/concepts/hosted-agents">What are hosted agents?</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/concepts/toolbox-overview">What is Toolbox in Foundry?</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox">Create and manage a toolbox in Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/concepts/workflow">Build a workflow in Microsoft Foundry (Preview)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/concepts/long-running-agent-resilience">Resilience for long-running Microsoft Foundry hosted agents (preview)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/how-to/publish-copilot">Publish agents to Microsoft Copilot and Microsoft Teams in the Foundry portal</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-decision" data-astro-cid-eomsrdgo>The decision</a></li><li data-astro-cid-eomsrdgo><a href="#reference-design" data-astro-cid-eomsrdgo>Reference design</a></li><li data-astro-cid-eomsrdgo><a href="#questions-to-ask-the-client" data-astro-cid-eomsrdgo>Questions to ask the client</a></li><li data-astro-cid-eomsrdgo><a href="#review-checklist" data-astro-cid-eomsrdgo>Review checklist</a></li><li data-astro-cid-eomsrdgo><a href="#anti-patterns" data-astro-cid-eomsrdgo>Anti-patterns</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Agent architecture</a></li></ul> </div>  </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

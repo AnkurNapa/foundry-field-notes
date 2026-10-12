@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Fine-tuning and distillation: prove it beats a better prompt | Foundry Field Notes</title><meta name="description" content="Decide when to fine-tune in Microsoft Foundry, distil a large model into a small one with supervised fine-tuning, then prove it beat the best prompt."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/fine-tuning-distillation/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Fine-tuning and distillation: prove it beats a better prompt"><meta property="og:description" content="Decide when to fine-tune in Microsoft Foundry, distil a large model into a small one with supervised fine-tuning, then prove it beat the best prompt."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/fine-tuning-distillation/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/fine-tuning-distillation.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Fine-tuning and distillation: prove it beats a better prompt</h1> <p class="lede" data-astro-cid-eomsrdgo>Fine-tune only after a good prompt has stalled. Measure the prompt first, train a small model on teacher-labelled examples, then compare both on the same held-out test set.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-3)" data-astro-cid-eomsrdgo>Level 3</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Models" data-astro-cid-eomsrdgo>Models</a><a class="pill" href="/foundry-field-notes/articles/?tag=Evaluation" data-astro-cid-eomsrdgo>Evaluation</a><a class="pill" href="/foundry-field-notes/articles/?tag=Cost" data-astro-cid-eomsrdgo>Cost</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>Fine-tuning changes a model's weights with your examples. It can make a small model as accurate as a big one on a narrow task. It also removes the examples you were stuffing into every prompt. In exchange, it adds training cost, hosting cost and a second retirement clock.</p>
+<p>So earn it. First write the best prompt you can and score it on a held-out test set. Then fine-tune, score the fine-tuned model on the same set and keep it only if it wins on accuracy, tokens or both. Distillation is the cheap way to get training data: a large teacher model labels your real messages. A small student model learns from those labels.</p>
+<p>This step covers the AI-103 skill areas <strong>Implement text analysis solutions</strong> (customising model outputs for domain tasks) and <strong>Implement generative AI and agentic solutions</strong> (evaluating models and apps).</p>
+<h2 id="the-symptom">The symptom</h2>
+<p>Harbour Goods routes every support message to one of six queues: returns, delivery, warranty, billing, store and escalate. The router runs on <code>gpt-5.4-mini</code> with a few-shot prompt: the instructions plus twelve worked examples, two per queue. Accuracy is acceptable. The bill isn't. Every message, however short, carries the same block of examples.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Prompt</th><th>Approximate tokens</th></tr></thead><tbody><tr><td>Few-shot prompt (instructions plus 12 examples)</td><td>234</td></tr><tr><td>Instructions only</td><td>35</td></tr><tr><td>Average customer message in the test set</td><td>10</td></tr></tbody></table>
+<p>Those counts use the Learn rule of thumb of four characters per token. The real numbers come back in <code>usage.input_tokens</code>.</p>
+<h2 id="measure-it">Measure it</h2>
+<p>Three files in <code>public/samples</code>, all synthetic:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>File</th><th>Rows</th><th>Use</th></tr></thead><tbody><tr><td><a href="/foundry-field-notes/samples/fine-tuning-distillation-train.jsonl">fine-tuning-distillation-train.jsonl</a></td><td>60</td><td>Training examples in chat format.</td></tr><tr><td><a href="/foundry-field-notes/samples/fine-tuning-distillation-validation.jsonl">fine-tuning-distillation-validation.jsonl</a></td><td>20</td><td>Validation during training.</td></tr><tr><td><a href="/foundry-field-notes/samples/fine-tuning-distillation-test.csv">fine-tuning-distillation-test.csv</a></td><td>30</td><td>Held-out test set. Never train on it.</td></tr><tr><td><a href="/foundry-field-notes/samples/fine-tuning-distillation-prompt-instructions.txt">fine-tuning-distillation-prompt-instructions.txt</a></td><td>1</td><td>The short prompt.</td></tr><tr><td><a href="/foundry-field-notes/samples/fine-tuning-distillation-prompt-few-shot.txt">fine-tuning-distillation-prompt-few-shot.txt</a></td><td>1</td><td>The short prompt plus 12 examples.</td></tr></tbody></table>
+<p>The test set has 9 returns, 5 escalate, 4 delivery, 4 warranty, 4 billing and 4 store messages. Always guessing "returns" scores 30.0 percent. Any model has to clear that floor by a wide margin.</p>
+<p>Score each candidate with one script. Save it as <code>score.py</code>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> csv</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> sys</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.identity </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DefaultAzureCredential</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">PROJECT_ENDPOINT</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "https://hg-foundry-dev.services.ai.azure.com/api/projects/support-agent"</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">QUEUES</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"returns"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"delivery"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"warranty"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"billing"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"store"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"escalate"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">deployment, prompt_file </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> sys.argv[</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">], sys.argv[</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">instructions </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> open</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(prompt_file).read()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">project </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">endpoint</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">PROJECT_ENDPOINT</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">credential</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DefaultAzureCredential())</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">openai </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project.get_openai_client()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">rows </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> list</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(csv.DictReader(</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">open</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"fine-tuning-distillation-test.csv"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)))</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">correct </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> invalid </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> input_tokens </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 0</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> row </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> rows:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    response </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.responses.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">        model</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">deployment, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">instructions</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">instructions, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">input</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">row[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"message"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">], </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">max_output_tokens</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">16</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    )</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    answer </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> response.output_text.strip().lower()</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    invalid </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">+=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> answer </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">not</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> in</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> QUEUES</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    correct </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">+=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> answer </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">==</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> row[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"queue"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    input_tokens </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">+=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> response.usage.input_tokens</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">deployment</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">correct</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{len</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(rows)</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> correct, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">invalid</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> invalid labels, "</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">      f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">{</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">input_tokens </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> len</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(rows)</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">:.0f</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">}</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> input tokens per call"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span></code></pre>
+<p><code>max_output_tokens</code> caps everything the model generates, including reasoning tokens. If a reasoning model returns an empty answer, raise the cap.</p>
+<p>Run the two prompt baselines:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">python</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> score.py</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> gpt-5.4-mini</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> fine-tuning-distillation-prompt-instructions.txt</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">python</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> score.py</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> gpt-5.4-mini</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> fine-tuning-distillation-prompt-few-shot.txt</span></span></code></pre>
+<p>Write both results down before you train anything. That is the bar.</p>
+<h2 id="fix-it">Fix it</h2>
+<h3 id="decide-whether-to-fine-tune-at-all">Decide whether to fine-tune at all</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Signal</th><th>Do this instead of fine-tuning</th></tr></thead><tbody><tr><td>The model lacks current facts</td><td>Retrieval. Fine-tuning doesn't replace it.</td></tr><tr><td>Few-shot accuracy is already at target</td><td>Keep the prompt. Try a cheaper model with it first.</td></tr><tr><td>Errors cluster on one confusing pair of queues</td><td>Fix the instructions for that pair, then rescore.</td></tr><tr><td>Accuracy is fine but the example block dominates tokens on high volume</td><td>Fine-tune a small model. This is the case here.</td></tr><tr><td>A small model must match a big one on one narrow task</td><td>Distil. Also the case here.</td></tr></tbody></table>
+<h3 id="distil-let-a-teacher-label-the-data">Distil: let a teacher label the data</h3>
+<p>Run a large model with the few-shot prompt over a pool of real, unlabelled messages. Keep only answers that are valid queue names. Spot-check a sample by hand. Then write each pair in the chat format training expects, one conversation per line:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"messages"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"system"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"content"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Route the Harbour Goods support message to one queue: returns, delivery, warranty, billing, store, escalate. Reply with the queue name only."</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}, {</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"user"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"content"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"I was charged twice for the iron"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}, {</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"assistant"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"content"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"billing"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}]}</span></span></code></pre>
+<p>Notice the system message in the training data is the short one. The student learns the behaviour, so it doesn't need the examples at run time. That is where the token saving comes from.</p>
+<p>The sample training file already has this shape. In a real project, the teacher would be a larger current model such as <code>gpt-5.4</code>. You would also keep the teacher's raw outputs for audit.</p>
+<h3 id="pick-a-base-model-you-can-actually-train">Pick a base model you can actually train</h3>
+<p>In October 2026, supervised fine-tuning (SFT) in the current Foundry experience supports, among others, <code>gpt-4.1</code>, <code>gpt-4.1-mini</code>, <code>gpt-4.1-nano</code>, <code>gpt-4o</code>, <code>gpt-4o-mini</code>, <code>gpt-oss-20b</code>, <code>Llama-3.3-70B-Instruct</code>, <code>Qwen3-32B</code> and <code>Ministral-3B</code>. Check the supported models table before you start, because method, training type and deployment option vary by model.</p>
+<p>Read the retirement schedule at the same time. Every OpenAI model with SFT in that table is already marked <strong>Deprecated</strong>. <code>gpt-4.1-nano</code> version <code>2025-04-14</code> retires on 14 April 2027. Fine-tuned <code>gpt-4.1-nano</code> deployments retire on 14 October 2027. That is enough for a measured experiment, not for a five-year plan. <code>gpt-oss-20b</code> supports SFT with Global Standard serving and has no retirement date listed.</p>
+<p>This walkthrough trains <code>gpt-4.1-nano</code> with Global training.</p>
+<h3 id="train">Train</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> os</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.identity </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DefaultAzureCredential</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">project </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    endpoint</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">os.environ[</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"FOUNDRY_PROJECT_ENDPOINT"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    credential</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DefaultAzureCredential(),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">client </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project.get_openai_client()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">with</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> open</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"fine-tuning-distillation-train.jsonl"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"rb"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">as</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> training:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    training_file </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> client.files.create(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">file</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">training, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">purpose</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"fine-tune"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">with</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> open</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"fine-tuning-distillation-validation.jsonl"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"rb"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">as</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> validation:</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    validation_file </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> client.files.create(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">file</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">validation, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">purpose</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"fine-tune"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">client.files.wait_for_processing(training_file.id)</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">client.files.wait_for_processing(validation_file.id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">job </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> client.fine_tuning.jobs.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    model</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"gpt-4.1-nano-2025-04-14"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    training_file</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">training_file.id,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    validation_file</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">validation_file.id,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    suffix</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"hg-router"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    method</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "type"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"supervised"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">        "supervised"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">            "hyperparameters"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "batch_size"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"auto"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "learning_rate_multiplier"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"auto"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">                "n_epochs"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"auto"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">        },</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    },</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    extra_body</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"trainingType"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"GlobalStandard"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">},</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(job.id, job.status)</span></span></code></pre>
+<p>Confirm the exact model identifier against the supported models table. The training role is <strong>Foundry User</strong>. Deploying the result needs <strong>Foundry Owner</strong>.</p>
+<p>Watch <code>train_loss</code>, <code>full_valid_loss</code> and <code>full_valid_mean_token_accuracy</code> in the job's <strong>Monitor</strong> view, or list events and checkpoints with <code>client.fine_tuning.jobs.list_events(job.id)</code> and <code>client.fine_tuning.jobs.checkpoints.list(job.id)</code>. If training loss falls while validation loss rises, the model is memorising. Don't assume the last checkpoint is the best one.</p>
+<h3 id="deploy-for-evaluation">Deploy for evaluation</h3>
+<p>Deploy the fine-tuned model from the portal. For the test, choose the <strong>Developer</strong> deployment type where your model supports it. It has no hourly hosting fee, lasts 24 hours and carries no SLA. That is exactly right for scoring 30 rows.</p>
+<h2 id="prove-it">Prove it</h2>
+<p>Run the same script on the fine-tuned deployment with the short prompt:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">python</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> score.py</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> gpt-4.1-nano-ft-hg-router</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> fine-tuning-distillation-prompt-instructions.txt</span></span></code></pre>
+<p>Fill the table from your three runs. The token column is computed from the sample files. The accuracy column comes only from your runs.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Candidate</th><th>Prompt</th><th>Approximate input tokens per call</th><th>Correct out of 30</th></tr></thead><tbody><tr><td>Floor</td><td>Always "returns"</td><td>Not applicable</td><td>9 (30.0 percent).</td></tr><tr><td><code>gpt-5.4-mini</code></td><td>Instructions only</td><td>45</td><td>Your run.</td></tr><tr><td><code>gpt-5.4-mini</code></td><td>Few-shot</td><td>244</td><td>Your run.</td></tr><tr><td>Fine-tuned <code>gpt-4.1-nano</code></td><td>Instructions only</td><td>45</td><td>Your run.</td></tr></tbody></table>
+<p>The saving is about 199 input tokens per call. At 10,000 messages that is about 1,990,000 input tokens you no longer send.</p>
+<p>Ship the fine-tune only if all three hold:</p>
+<ol>
+<li>It scores at least as well as the few-shot prompt on the 30 held-out rows.</li>
+<li>It returns no invalid labels.</li>
+<li>The token saving, priced at your region's rates, beats the fine-tuned model's hosting charge for your volume. Fine-tuned deployments on Standard bill hosting hours even when idle. Global Standard serving has per-token billing.</li>
+</ol>
+<p>If the fine-tune loses, you have still learned something cheap: the prompt was good enough.</p>
+<h2 id="where-this-breaks">Where this breaks</h2>
+<ul>
+<li><strong>Leaking the test set.</strong> If test rows end up in training, the score means nothing. Keep the three files apart from day one.</li>
+<li><strong>Too little data.</strong> Sixty rows is enough to see a trend, not to ship. Learn's classic guidance suggests 50 to 100 examples to test and 500 or more for production.</li>
+<li><strong>Teacher mistakes become student habits.</strong> Distillation copies the teacher's errors. Hand-check a sample of teacher labels before training.</li>
+<li><strong>Limits.</strong> In October 2026, 100 training jobs per resource, three running at once for standard and global training, 10 fine-tuned deployments and 1 GB of fine-tuning files per resource.</li>
+<li><strong>Region and type.</strong> Global training doesn't offer data residency. Data zone training supports only the US zone.</li>
+<li><strong>Two retirement clocks.</strong> A fine-tuned model can't auto-upgrade. When its base retires, you retrain on a new base and rerun this whole comparison.</li>
+<li><strong>Stored completions.</strong> The older stored-completions distillation flow is deprecated. Build the teacher dataset yourself, as above.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>To score more than accuracy, use <a href="/foundry-field-notes/articles/custom-evaluators-test-sets/">Custom evaluators and test sets</a>. If the real problem is speed rather than tokens, read <a href="/foundry-field-notes/articles/latency-throughput-caching/">Latency, throughput and caching</a>. For keeping fine-tunes alive across base model retirements, see <a href="/foundry-field-notes/articles/model-strategy-estate/">Model strategy for an estate</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>A distillery's quality team sorts customer complaints into six types: off-aroma, haze, closure, label, delivery and other. Distillery A first tried a long prompt full of examples, then distilled a large model's labels into a small one. Both scored the same on 50 held-out complaints. The small model needed a fifth of the input tokens, so it stayed. The day its base model's retirement date arrived on the calendar, the team reran the same 50.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/fine-tuning/overview">Fine-tuning in Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/how-to/fine-tuning">Fine-tune a model with supervised fine-tuning in Microsoft Foundry</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/concepts/model-retirement-schedule">Model retirement schedule</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/quotas-limits">Azure OpenAI in Microsoft Foundry Models quotas and limits</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types">Deployment types for Microsoft Foundry Models</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry/openai/how-to/reasoning">Azure OpenAI reasoning models</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry-classic/concepts/fine-tuning-overview">Fine-tune models with Microsoft Foundry (classic)</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/foundry-classic/openai/how-to/stored-completions">Azure OpenAI stored completions and distillation (deprecated)</a>.</li>
+<li><a href="https://learn.microsoft.com/azure/ai-foundry/openai/how-to/manage-costs">Plan to manage costs for Azure OpenAI</a>.</li>
+<li><a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103">Study guide for Exam AI-103</a>.</li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-symptom" data-astro-cid-eomsrdgo>The symptom</a></li><li data-astro-cid-eomsrdgo><a href="#measure-it" data-astro-cid-eomsrdgo>Measure it</a></li><li data-astro-cid-eomsrdgo><a href="#fix-it" data-astro-cid-eomsrdgo>Fix it</a></li><li data-astro-cid-eomsrdgo><a href="#prove-it" data-astro-cid-eomsrdgo>Prove it</a></li><li data-astro-cid-eomsrdgo><a href="#where-this-breaks" data-astro-cid-eomsrdgo>Where this breaks</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-3" data-astro-cid-eomsrdgo>Level 3: Fine-tuning and distillation</a></li></ul> </div> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>Next on the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Model strategy for an estate</a></li></ul> </div> </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

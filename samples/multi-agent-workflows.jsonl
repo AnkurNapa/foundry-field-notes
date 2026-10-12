@@ -1,0 +1,24 @@
+{"ticket_id": "TK-1001", "store_code": "ST-007", "category_expected": "order", "text": "Where is my order HG-260911-0971? It says shipped but nothing since."}
+{"ticket_id": "TK-1002", "store_code": "ST-003", "category_expected": "delivery", "text": "My order HG-260913-0667 to Pune was promised in 3 working days. It is day 5."}
+{"ticket_id": "TK-1003", "store_code": "ST-019", "category_expected": "return", "text": "I want to return a kettle from order HG-260903-0841. I have the receipt and it is 12 days old."}
+{"ticket_id": "TK-1004", "store_code": "ST-019", "category_expected": "return", "text": "Can I return a jacket from order HG-260904-0375? I bought it 41 days ago."}
+{"ticket_id": "TK-1005", "store_code": "ST-019", "category_expected": "warranty", "text": "The headphones from order HG-260902-0932 stopped working after 7 months. Is this covered?"}
+{"ticket_id": "TK-1006", "store_code": "ST-003", "category_expected": "warranty", "text": "My mixer from order HG-260907-0039 broke after 14 months. Can you replace it?"}
+{"ticket_id": "TK-1007", "store_code": "ST-003", "category_expected": "order", "text": "Please change the delivery address on order HG-260914-0429."}
+{"ticket_id": "TK-1008", "store_code": "ST-019", "category_expected": "delivery", "text": "Order HG-260908-0093 arrived damaged. What now?"}
+{"ticket_id": "TK-1009", "store_code": "ST-019", "category_expected": "order", "text": "Where is my order HG-260914-0061? It says shipped but nothing since."}
+{"ticket_id": "TK-1010", "store_code": "ST-099", "category_expected": "delivery", "text": "My order HG-260904-0971 to Pune was promised in 3 working days. It is day 5."}
+{"ticket_id": "TK-1011", "store_code": "ST-019", "category_expected": "return", "text": "I want to return a kettle from order HG-260921-0643. I have the receipt and it is 12 days old."}
+{"ticket_id": "TK-1012", "store_code": "ST-019", "category_expected": "return", "text": "Can I return a jacket from order HG-260902-0591? I bought it 41 days ago."}
+{"ticket_id": "TK-1013", "store_code": "ST-007", "category_expected": "warranty", "text": "The headphones from order HG-260913-0051 stopped working after 7 months. Is this covered?"}
+{"ticket_id": "TK-1014", "store_code": "ST-007", "category_expected": "warranty", "text": "My mixer from order HG-260902-0571 broke after 14 months. Can you replace it?"}
+{"ticket_id": "TK-1015", "store_code": "ST-007", "category_expected": "order", "text": "Please change the delivery address on order HG-260910-0430."}
+{"ticket_id": "TK-1016", "store_code": "ST-019", "category_expected": "delivery", "text": "Order HG-260918-0121 arrived damaged. What now?"}
+{"ticket_id": "TK-1017", "store_code": "ST-022", "category_expected": "order", "text": "Where is my order HG-260910-0574? It says shipped but nothing since."}
+{"ticket_id": "TK-1018", "store_code": "ST-019", "category_expected": "delivery", "text": "My order HG-260906-0106 to Pune was promised in 3 working days. It is day 5."}
+{"ticket_id": "TK-1019", "store_code": "ST-007", "category_expected": "return", "text": "I want to return a kettle from order HG-260919-0655. I have the receipt and it is 12 days old."}
+{"ticket_id": "TK-1020", "store_code": "ST-019", "category_expected": "return", "text": "Can I return a jacket from order HG-260912-0100? I bought it 41 days ago."}
+{"ticket_id": "TK-1021", "store_code": "ST-019", "category_expected": "warranty", "text": "The headphones from order HG-260923-0065 stopped working after 7 months. Is this covered?"}
+{"ticket_id": "TK-1022", "store_code": "ST-007", "category_expected": "warranty", "text": "My mixer from order HG-260902-0634 broke after 14 months. Can you replace it?"}
+{"ticket_id": "TK-1023", "store_code": "ST-019", "category_expected": "order", "text": "Please change the delivery address on order HG-260916-0697."}
+{"ticket_id": "TK-1024", "store_code": "ST-011", "category_expected": "delivery", "text": "Order HG-260914-0796 arrived damaged. What now?"}

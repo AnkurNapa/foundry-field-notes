@@ -1,0 +1,61 @@
+order_id,order_date,store_code,store_name,category,amount_inr,status
+HG-260301-0032,2026-03-01,ST-003,Bengaluru South,Kitchen,2820,Delivered
+HG-260302-0011,2026-03-02,ST-022,Kolkata East,Home,2770,In transit
+HG-260303-0023,2026-03-03,ST-003,Bengaluru South,Electronics,7510,Delivered
+HG-260303-0058,2026-03-03,ST-007,Chennai South,Electronics,22000,Delivered
+HG-260304-0008,2026-03-04,ST-011,Mumbai West,Kitchen,2470,Returned
+HG-260305-0002,2026-03-05,ST-022,Kolkata East,Electronics,20370,Delivered
+HG-260305-0007,2026-03-05,ST-007,Chennai South,Kitchen,1140,Delivered
+HG-260306-0028,2026-03-06,ST-014,Pune West,Electronics,11130,In transit
+HG-260306-0031,2026-03-06,ST-019,Delhi North,Electronics,22130,Delivered
+HG-260307-0053,2026-03-07,ST-014,Pune West,Electronics,7890,Delivered
+HG-260307-0056,2026-03-07,ST-003,Bengaluru South,Electronics,12780,Delivered
+HG-260308-0021,2026-03-08,ST-022,Kolkata East,Kitchen,3810,Returned
+HG-260308-0033,2026-03-08,ST-019,Delhi North,Electronics,5310,Delivered
+HG-260308-0039,2026-03-08,ST-007,Chennai South,Electronics,13580,Delivered
+HG-260308-0050,2026-03-08,ST-003,Bengaluru South,Apparel,2750,Delivered
+HG-260309-0006,2026-03-09,ST-003,Bengaluru South,Home,3860,Delivered
+HG-260309-0016,2026-03-09,ST-022,Kolkata East,Home,3060,Returned
+HG-260310-0010,2026-03-10,ST-022,Kolkata East,Kitchen,1880,Delivered
+HG-260311-0048,2026-03-11,ST-003,Bengaluru South,Home,1970,Delivered
+HG-260313-0018,2026-03-13,ST-099,,Electronics,9410,In transit
+HG-260313-0020,2026-03-13,ST-022,Kolkata East,Apparel,1080,Delivered
+HG-260313-0022,2026-03-13,ST-011,Mumbai West,Home,1530,Delivered
+HG-260313-0025,2026-03-13,ST-019,Delhi North,Apparel,2670,Delivered
+HG-260313-0054,2026-03-13,ST-011,Mumbai West,Apparel,1670,Delivered
+HG-260314-0003,2026-03-14,ST-003,Bengaluru South,Electronics,5570,Delivered
+HG-260314-0046,2026-03-14,ST-011,Mumbai West,Apparel,2180,Delivered
+HG-260315-0049,2026-03-15,ST-007,Chennai South,Apparel,1250,Delivered
+HG-260317-0004,2026-03-17,ST-019,Delhi North,Electronics,20890,Delivered
+HG-260318-0015,2026-03-18,ST-022,Kolkata East,Home,1740,Delivered
+HG-260318-0026,2026-03-18,ST-003,Bengaluru South,Electronics,20100,Delivered
+HG-260318-0040,2026-03-18,ST-007,Chennai South,Home,460,Delivered
+HG-260319-0019,2026-03-19,ST-022,Kolkata East,Kitchen,2040,Delivered
+HG-260319-0057,2026-03-19,ST-014,Pune West,Home,860,In transit
+HG-260319-0060,2026-03-19,ST-007,Chennai South,Electronics,22800,Delivered
+HG-260320-0036,2026-03-20,ST-014,Pune West,Home,4820,Delivered
+HG-260321-0001,2026-03-21,ST-003,Bengaluru South,Electronics,11510,Delivered
+HG-260321-0005,2026-03-21,ST-022,Kolkata East,Apparel,1400,Delivered
+HG-260321-0013,2026-03-21,ST-011,Mumbai West,Home,3430,Delivered
+HG-260321-0030,2026-03-21,ST-019,Delhi North,Home,1650,Delivered
+HG-260321-0038,2026-03-21,ST-011,Mumbai West,Apparel,2620,Delivered
+HG-260321-0041,2026-03-21,ST-003,Bengaluru South,Home,950,In transit
+HG-260321-0051,2026-03-21,ST-019,Delhi North,Electronics,5560,In transit
+HG-260322-0014,2026-03-22,ST-011,Mumbai West,Electronics,22460,Delivered
+HG-260322-0043,2026-03-22,ST-014,Pune West,Home,4820,Delivered
+HG-260323-0037,2026-03-23,ST-007,Chennai South,Kitchen,3570,In transit
+HG-260324-0009,2026-03-24,ST-014,Pune West,Electronics,14900,Delivered
+HG-260324-0047,2026-03-24,ST-003,Bengaluru South,Electronics,4490,Delivered
+HG-260325-0017,2026-03-25,ST-003,Bengaluru South,Home,660,Returned
+HG-260325-0027,2026-03-25,ST-022,Kolkata East,Kitchen,1210,Delivered
+HG-260325-0029,2026-03-25,ST-007,Chennai South,Electronics,22990,Delivered
+HG-260326-0024,2026-03-26,ST-022,Kolkata East,Apparel,2940,Delivered
+HG-260326-0045,2026-03-26,ST-014,Pune West,Home,1170,Delivered
+HG-260327-0034,2026-03-27,ST-003,Bengaluru South,Home,1450,Delivered
+HG-260328-0012,2026-03-28,ST-007,Chennai South,Electronics,14960,Delivered
+HG-260328-0042,2026-03-28,ST-011,Mumbai West,Electronics,19350,Delivered
+HG-260328-0052,2026-03-28,ST-007,Chennai South,Home,3730,Delivered
+HG-260328-0059,2026-03-28,ST-007,Chennai South,Apparel,990,In transit
+HG-260330-0044,2026-03-30,ST-019,Delhi North,Apparel,1500,Delivered
+HG-260331-0035,2026-03-31,ST-019,Delhi North,Home,2570,Delivered
+HG-260331-0055,2026-03-31,ST-022,Kolkata East,Apparel,1130,Delivered

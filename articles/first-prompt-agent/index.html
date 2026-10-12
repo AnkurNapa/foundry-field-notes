@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Your first prompt agent: the Harbour Goods support agent | Foundry Field Notes</title><meta name="description" content="Build, test and version a Foundry Agent Service prompt agent in the portal, then call it from Python with the Responses API and keyless auth."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/first-prompt-agent/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Your first prompt agent: the Harbour Goods support agent"><meta property="og:description" content="Build, test and version a Foundry Agent Service prompt agent in the portal, then call it from Python with the Responses API and keyless auth."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/first-prompt-agent/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/first-prompt-agent.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Your first prompt agent: the Harbour Goods support agent</h1> <p class="lede" data-astro-cid-eomsrdgo>Build the Harbour Goods customer support agent as a prompt agent in the new Foundry portal. Write its instructions, test it against six questions with known answers, save it as version 1, change it and save version 2, then call the same agent from Python.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-1)" data-astro-cid-eomsrdgo>Level 1</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Agents" data-astro-cid-eomsrdgo>Agents</a><a class="pill" href="/foundry-field-notes/articles/?tag=SDK" data-astro-cid-eomsrdgo>SDK</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>A prompt agent is a model, instructions and optional tools, saved in Foundry as a versioned definition. Foundry runs it. You build it in the portal under <strong>Build</strong>, test it in the playground on the right and select <strong>Save</strong> to create a version. Versions are immutable. Every change you save becomes a new version you can compare and roll back to. In code, you refer to an agent as <code>&#x3C;agent_name>:&#x3C;version></code>.</p>
+<p>This step maps to the AI-103 area "Build agents by using Foundry": defining an agent's role, goals, conversation tracking and tool schemas.</p>
+<h2 id="what-you-will-build">What you will build</h2>
+<p>The Harbour Goods support agent. It answers order, delivery, returns and warranty questions for a six-store retailer. It has no tools yet. Everything it knows comes from its instructions, which carry the company's four policies. Tools come in the next article.</p>
+<p>By the end you'll have:</p>
+<ul>
+<li>An agent called <code>harbour-goods-support</code> with two saved versions.</li>
+<li>Six test questions and the answers the agent should give.</li>
+<li>A Python script that chats with the agent through the Responses API with keyless auth.</li>
+</ul>
+<p>The policy facts come from <a href="/foundry-field-notes/samples/first-prompt-agent.md">first-prompt-agent.md</a>, a short synthetic policy pack.</p>
+<h2 id="before-you-start">Before you start</h2>
+<ul>
+<li>A Foundry project in the new Foundry portal, not a classic hub-based project.</li>
+<li>A chat model deployment in that project. This article uses a deployment named <code>gpt-5.4-mini</code>. Any current chat model works. If you don't have one, follow <a href="/foundry-field-notes/articles/deploy-first-model/">Deploy your first model and call it</a>.</li>
+<li>The <strong>Foundry User</strong> role on the project. Learn notes this role was previously named Azure AI User and the portal may still show the old name.</li>
+<li>For the Python part: Python 3.10 or later, the Azure CLI and <code>pip install "azure-ai-projects>=2.3.0" azure-identity</code>.</li>
+</ul>
+<h2 id="step-1-create-the-agent">Step 1: create the agent</h2>
+<ol>
+<li>Sign in to the <a href="https://ai.azure.com">Foundry portal</a> and open your project.</li>
+<li>In the top navigation, select <strong>Build</strong>. The list shows the agents in the project.</li>
+<li>Select the arrow next to <strong>New agent</strong>, then select <strong>Build an agent</strong>.</li>
+<li>In the <strong>Create an agent</strong> dialog, enter <code>harbour-goods-support</code> as the <strong>Agent name</strong> and select <strong>Create</strong>.</li>
+</ol>
+<p>You can't rename an agent later. The name appears in traces, evaluations and code, so pick one you can live with.</p>
+<p>The agent opens on the <strong>Playground</strong> tab. Configuration is on the left. The test chat is on the right.</p>
+<h2 id="step-2-pick-the-model-and-write-the-instructions">Step 2: pick the model and write the instructions</h2>
+<ol>
+<li>Under <strong>Model</strong>, select your <code>gpt-5.4-mini</code> deployment.</li>
+<li>Paste these instructions into <strong>Instructions</strong>:</li>
+</ol>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>You are the Harbour Goods customer support agent. Harbour Goods is a retailer</span></span>
+<span class="line"><span>with six stores in India. You answer questions about orders, delivery, returns,</span></span>
+<span class="line"><span>warranty and support hours. Answer in plain English, in three sentences or fewer.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Policies:</span></span>
+<span class="line"><span>- Returns: accepted within 30 days of purchase with the receipt or order</span></span>
+<span class="line"><span>  confirmation. Items must be unused. No receipt, no return.</span></span>
+<span class="line"><span>- Delivery: 3 working days in metro cities, 5 working days elsewhere.</span></span>
+<span class="line"><span>  Working days are Monday to Saturday.</span></span>
+<span class="line"><span>- Electronics warranty: 12 months from delivery. Covers manufacturing faults,</span></span>
+<span class="line"><span>  not accidental or water damage.</span></span>
+<span class="line"><span>- Support hours: 9 AM to 9 PM IST, seven days a week.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Order IDs look like HG-240318-0042. You can't see order status yet. If someone</span></span>
+<span class="line"><span>asks where an order is, ask for the order ID and say a colleague will check it.</span></span>
+<span class="line"><span>Never invent an order status, a refund amount or a policy that isn't listed here.</span></span></code></pre>
+<p>The last line matters. Without a tool, the model has no way to see an order. Tell it so, or it will guess.</p>
+<h2 id="step-3-test-it-in-the-playground">Step 3: test it in the playground</h2>
+<p>Ask each question in the chat pane. Compare with the expected answer.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>#</th><th>Question</th><th>The answer must say</th></tr></thead><tbody><tr><td>1</td><td>I bought a kettle 12 days ago and have the receipt. Can I return it?</td><td>Yes, within 30 days, unused</td></tr><tr><td>2</td><td>Can I return a jacket I bought 41 days ago?</td><td>No, outside 30 days</td></tr><tr><td>3</td><td>How long does delivery to Mumbai take?</td><td>3 working days</td></tr><tr><td>4</td><td>My headphones stopped working after 7 months. Covered?</td><td>Yes, if it's a manufacturing fault, within 12 months</td></tr><tr><td>5</td><td>Where is order HG-240318-0042?</td><td>It can't see order status. A colleague will check</td></tr><tr><td>6</td><td>Are you open at 10 PM?</td><td>No, 9 AM to 9 PM IST</td></tr></tbody></table>
+<p>Question 5 is the one to watch. A good answer admits it can't see the order.</p>
+<h2 id="step-4-save-version-1">Step 4: save version 1</h2>
+<p>Select <strong>Save</strong>. This creates version 1.</p>
+<p>Learn is explicit that you can test unsaved changes in the playground. To see conversation history, monitor the agent or run full evaluations, you have to save. Unsaved changes are lost if you leave the portal.</p>
+<h2 id="step-5-change-it-and-save-version-2">Step 5: change it and save version 2</h2>
+<p>Support wants the agent to quote the store code when a customer names a store. Add this to the end of the instructions:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>Store codes: ST-003 Bengaluru South, ST-007 Chennai South, ST-011 Mumbai West,</span></span>
+<span class="line"><span>ST-014 Pune West, ST-019 Delhi North, ST-022 Kolkata East. If a customer gives</span></span>
+<span class="line"><span>a store code you don't recognise, say so and list the six valid codes.</span></span></code></pre>
+<p>Ask "I bought it at ST-099, can I return it there?". The agent should say ST-099 isn't a Harbour Goods store and list the six codes.</p>
+<p>Select <strong>Save</strong> again. That's version 2.</p>
+<p>Now use the version selector next to the agent name. Open version 1 and ask the ST-099 question again. It won't know about store codes. Learn lists three comparisons you can make between versions: the agent setup, the chat output for identical inputs and the YAML definition.</p>
+<h2 id="step-6-call-the-agent-from-python">Step 6: call the agent from Python</h2>
+<p>Copy the project endpoint from the project <strong>Overview</strong> page. Sign in with <code>az login</code>, then run:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.identity </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> DefaultAzureCredential</span></span>
+<span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">from</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> azure.ai.projects </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">import</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># Format: https://&#x3C;resource-name>.services.ai.azure.com/api/projects/&#x3C;project-name></span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">FOUNDRY_PROJECT_ENDPOINT</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "your_project_endpoint"</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">FOUNDRY_AGENT_NAME</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> =</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> "harbour-goods-support"</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">project </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> AIProjectClient(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    endpoint</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">FOUNDRY_PROJECT_ENDPOINT</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    credential</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">DefaultAzureCredential(),</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># An OpenAI client bound to the agent</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">openai </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> project.get_openai_client(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">agent_name</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">FOUNDRY_AGENT_NAME</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># A conversation keeps history across turns</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">conversation </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.conversations.create()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">response </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.responses.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    conversation</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">conversation.id,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    input</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"I bought a kettle 12 days ago and have the receipt. Can I return it?"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(response.output_text)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">response </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> openai.responses.create(</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    conversation</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">conversation.id,</span></span>
+<span class="line"><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">    input</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"And if it had been 41 days?"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">print</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(response.output_text)</span></span></code></pre>
+<p>There's no API key anywhere. <code>DefaultAzureCredential</code> picks up your Azure CLI sign-in.</p>
+<p>If you'd rather define the agent in code, <code>project.agents.create_version()</code> with a <code>PromptAgentDefinition</code> does the same as <strong>Save</strong>. Learn's quickstart shows it. That's the route for a CI/CD pipeline, covered later in <a href="/foundry-field-notes/articles/ci-cd-agents/">CI/CD for agents</a>.</p>
+<h2 id="check-it-worked">Check it worked</h2>
+<ul>
+<li>The <strong>Build</strong> list shows <code>harbour-goods-support</code>.</li>
+<li>The version selector shows versions 1 and 2.</li>
+<li>Version 2 rejects ST-099 and lists the six valid codes. Version 1 doesn't mention store codes.</li>
+<li>The Python script prints two answers. The first says yes, within 30 days. The second says no. The second answer only makes sense because the conversation kept the first turn.</li>
+</ul>
+<h2 id="where-this-breaks">Where this breaks</h2>
+<ul>
+<li><strong>The agent invents an order status.</strong> Tighten the instruction and retest question 5. The real fix is a tool, which is the next article.</li>
+<li><strong>Long policies in the instructions.</strong> Four short policies fit. A forty-page returns manual doesn't. Move documents into file search, covered in <a href="/foundry-field-notes/articles/ground-agent-in-files/">Ground an agent in your files</a>.</li>
+<li><strong>Forgetting to save.</strong> Conversation history, monitoring and full evaluations need a saved version.</li>
+<li><strong>Playground evaluations cost money.</strong> They're on by default in every Foundry project and billed as consumption. Turn them off in the metrics menu at the top of the playground if you're iterating fast.</li>
+<li><strong>Old code samples.</strong> The code here uses <code>azure-ai-projects</code> 2.x. It doesn't work with 1.x or the classic agents.</li>
+<li><strong>A 404 on an agent you created yesterday.</strong> Learn says to treat a 404 as terminal: the agent was deleted. Recreate it rather than retrying.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>Give this agent file search, code interpreter and web search in <a href="/foundry-field-notes/articles/built-in-agent-tools/">Give an agent built-in tools</a>. Then watch it think in <a href="/foundry-field-notes/articles/trace-agent-run/">Trace an agent run</a> and score it in <a href="/foundry-field-notes/articles/run-first-evaluation/">Run your first evaluation</a>. The full track is on the <a href="/foundry-field-notes/roadmap/">roadmap</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>Brewery A's taproom staff ask the same five questions every shift: what's gluten-reduced, what's on the guest tap, how long a growler keeps. A prompt agent with those answers in its instructions handles it in an afternoon. When the head brewer changes the guest tap, someone edits the instructions and saves version 7. If version 7 starts recommending a keg that's already empty, the bar manager rolls back to version 6 before the evening rush.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/quickstarts/prompt-agent">Quickstart: Create a prompt agent</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/concepts/development-lifecycle">Agent development lifecycle</a></li>
+<li><a href="https://learn.microsoft.com/fabric/data-science/data-agent-foundry-fabric-iq">Add Fabric data agents to a Foundry agent with Fabric IQ (preview)</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds">Microsoft Foundry Playgrounds</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/how-to/tools/file-search">File search tool for agents</a></li>
+<li><a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103">Study guide for Exam AI-103: Developing AI Apps and Agents on Azure</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#what-you-will-build" data-astro-cid-eomsrdgo>What you will build</a></li><li data-astro-cid-eomsrdgo><a href="#before-you-start" data-astro-cid-eomsrdgo>Before you start</a></li><li data-astro-cid-eomsrdgo><a href="#step-1-create-the-agent" data-astro-cid-eomsrdgo>Step 1: create the agent</a></li><li data-astro-cid-eomsrdgo><a href="#step-2-pick-the-model-and-write-the-instructions" data-astro-cid-eomsrdgo>Step 2: pick the model and write the instructions</a></li><li data-astro-cid-eomsrdgo><a href="#step-3-test-it-in-the-playground" data-astro-cid-eomsrdgo>Step 3: test it in the playground</a></li><li data-astro-cid-eomsrdgo><a href="#step-4-save-version-1" data-astro-cid-eomsrdgo>Step 4: save version 1</a></li><li data-astro-cid-eomsrdgo><a href="#step-5-change-it-and-save-version-2" data-astro-cid-eomsrdgo>Step 5: change it and save version 2</a></li><li data-astro-cid-eomsrdgo><a href="#step-6-call-the-agent-from-python" data-astro-cid-eomsrdgo>Step 6: call the agent from Python</a></li><li data-astro-cid-eomsrdgo><a href="#check-it-worked" data-astro-cid-eomsrdgo>Check it worked</a></li><li data-astro-cid-eomsrdgo><a href="#where-this-breaks" data-astro-cid-eomsrdgo>Where this breaks</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-1" data-astro-cid-eomsrdgo>Level 1: Your first prompt agent</a></li></ul> </div> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>Next on the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-2" data-astro-cid-eomsrdgo>Level 2: Toolboxes and MCP servers</a></li><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-2" data-astro-cid-eomsrdgo>Level 2: Hosted agents with Agent Framework</a></li><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-2" data-astro-cid-eomsrdgo>Level 2: Multi-agent workflows</a></li></ul> </div> </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

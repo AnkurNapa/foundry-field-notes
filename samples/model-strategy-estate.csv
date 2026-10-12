@@ -1,0 +1,9 @@
+workload,model,version,deployment_type,retirement_date,suggested_replacement
+support-agent,gpt-5.4-mini,2026-03-17,GlobalStandard,2027-09-21,none listed
+ticket-router,gpt-4.1-nano (fine-tuned),2025-04-14,Standard,2027-10-14,re-tune on a newer base
+invoice-extract,gpt-5-mini,2025-08-07,DataZoneStandard,2027-02-09,none listed
+catalogue-copy,gpt-4o,2024-11-20,GlobalBatch,2027-04-14,gpt-5.1
+returns-reasoner,o4-mini,2025-04-16,GlobalStandard,2026-11-19,gpt-5.6-terra
+policy-search-embed,text-embedding-3-small,1,GlobalStandard,2028-02-09,none listed
+exec-summary,claude-haiku-4-5,1,GlobalStandard,2026-11-15,none listed
+router-default,model-router,2025-11-18,GlobalStandard,2027-05-20,none listed

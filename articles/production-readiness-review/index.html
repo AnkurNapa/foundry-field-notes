@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="en-GB" data-astro-cid-5hce7sga> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Production readiness review for a Foundry AI app | Foundry Field Notes</title><meta name="description" content="Run a production readiness review for a Microsoft Foundry app: GA versus preview scope, reference design, client questions and a go-live checklist."><link rel="canonical" href="https://ankurnapa.github.io/foundry-field-notes/articles/production-readiness-review/"><meta property="og:type" content="article"><meta property="og:site_name" content="Foundry Field Notes"><meta property="og:title" content="Production readiness review for a Foundry AI app"><meta property="og:description" content="Run a production readiness review for a Microsoft Foundry app: GA versus preview scope, reference design, client questions and a go-live checklist."><meta property="og:url" content="https://ankurnapa.github.io/foundry-field-notes/articles/production-readiness-review/"><meta property="og:image" content="https://ankurnapa.github.io/foundry-field-notes/og/production-readiness-review.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Ankur Napa"><script>
+      try { var t = localStorage.getItem('ffn-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    </script><meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#18171f" media="(prefers-color-scheme: dark)"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZHW47YJDC"></script><script>(function(){const gaId = "G-1ZHW47YJDC";
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        })();</script><link rel="icon" type="image/svg+xml" href="/foundry-field-notes/logo.svg"><link rel="apple-touch-icon" href="/foundry-field-notes/apple-touch-icon.png"><link rel="stylesheet" href="/foundry-field-notes/_astro/about.BQ6USFlS.css">
+<link rel="stylesheet" href="/foundry-field-notes/_astro/_id_.CxM-tgKf.css"></head> <body data-astro-cid-5hce7sga> <a class="skip" href="#main" data-astro-cid-5hce7sga>Skip to content</a> <header class="site-head" data-astro-cid-5hce7sga> <div class="wrap bar" data-astro-cid-5hce7sga> <a class="brand" href="/foundry-field-notes/" aria-label="Foundry Field Notes home" data-astro-cid-5hce7sga> <img src="/foundry-field-notes/logo.svg" width="28" height="28" alt="" data-astro-cid-5hce7sga> <span data-astro-cid-5hce7sga>Foundry <strong data-astro-cid-5hce7sga>Field Notes</strong></span> </a> <nav id="site-nav" aria-label="Main" data-astro-cid-5hce7sga> <a href="/foundry-field-notes/" class="home" aria-label="Home" data-astro-cid-5hce7sga> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" data-astro-cid-5hce7sga></path></svg> </a> <a href="/foundry-field-notes/start/" data-astro-cid-5hce7sga>Start here</a><a href="/foundry-field-notes/roadmap/" data-astro-cid-5hce7sga>Roadmap</a><a href="/foundry-field-notes/careers/" data-astro-cid-5hce7sga>Careers</a><a href="/foundry-field-notes/articles/" aria-current="page" data-astro-cid-5hce7sga>Articles</a><a href="/foundry-field-notes/questions/" data-astro-cid-5hce7sga>Questions</a><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Calculator</a><a href="/foundry-field-notes/events/" data-astro-cid-5hce7sga>Events</a><a href="/foundry-field-notes/about/" data-astro-cid-5hce7sga>About</a> <a class="nav-follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a> </nav> <a class="find" href="/foundry-field-notes/search/" aria-label="Search" data-astro-cid-5hce7sga> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="11" cy="11" r="7" data-astro-cid-5hce7sga></circle><path d="M20 20l-3.5-3.5" data-astro-cid-5hce7sga></path></svg> </a> <button class="theme" type="button" aria-label="Colour theme: auto" title="Colour theme" data-astro-cid-5hce7sga> <svg class="i-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="9" data-astro-cid-5hce7sga></circle><path d="M12 3v18" data-astro-cid-5hce7sga></path><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" data-astro-cid-5hce7sga></path></svg> <svg class="i-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><circle cx="12" cy="12" r="4" data-astro-cid-5hce7sga></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-5hce7sga></path></svg> <svg class="i-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-astro-cid-5hce7sga></path></svg> <span class="theme-label" data-astro-cid-5hce7sga>Auto</span> </button> <a class="follow" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow</a> <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-astro-cid-5hce7sga> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-astro-cid-5hce7sga><path class="m-open" d="M4 7h16M4 12h16M4 17h16" data-astro-cid-5hce7sga></path><path class="m-close" d="M6 6l12 12M18 6L6 18" data-astro-cid-5hce7sga></path></svg> <span class="menu-label" data-astro-cid-5hce7sga>Menu</span> </button> </div> </header> <main id="main" data-pagefind-body data-astro-cid-5hce7sga> <header class="head" data-astro-cid-eomsrdgo> <div class="wrap" data-astro-cid-eomsrdgo> <p class="back" data-astro-cid-eomsrdgo><a class="more back-link" href="/foundry-field-notes/articles/" data-astro-cid-eomsrdgo>All articles</a></p> <h1 data-astro-cid-eomsrdgo>Production readiness review for a Foundry AI app</h1> <p class="lede" data-astro-cid-eomsrdgo>The review that decides whether an AI app on Microsoft Foundry goes live: which features are GA and which are still preview, the reference components and their jobs, the questions to put to the client, a checklist that maps to evidence and the anti-patterns that fail a review.</p> <p class="facts" data-astro-cid-eomsrdgo> <span class="meta" data-astro-cid-eomsrdgo>12 Oct 2026</span>  <span class="badge asof" data-astro-cid-eomsrdgo>Foundry as of October 2026</span> <span class="badge docs" data-astro-cid-eomsrdgo>Checked against Microsoft Learn</span> <span class="badge lvl" style="--s: var(--stratum-4)" data-astro-cid-eomsrdgo>Level 4</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <span class="byline" data-astro-cid-eomsrdgo><img class="avatar" src="/foundry-field-notes/ankur.jpg" alt="" width="28" height="28" data-astro-cid-eomsrdgo> Ankur Napa</span> <span class="sep" aria-hidden="true" data-astro-cid-eomsrdgo></span> <a class="pill" href="/foundry-field-notes/articles/?tag=Governance" data-astro-cid-eomsrdgo>Governance</a><a class="pill" href="/foundry-field-notes/articles/?tag=Architecture" data-astro-cid-eomsrdgo>Architecture</a><a class="pill" href="/foundry-field-notes/articles/?tag=Evaluation" data-astro-cid-eomsrdgo>Evaluation</a> </p> </div> </header> <div class="wrap layout" data-astro-cid-eomsrdgo> <article class="body" data-astro-cid-eomsrdgo>  <h2 id="short-answer">Short answer</h2>
+<p>A readiness review answers one question with evidence: can this app take real traffic without surprising the people who own the risk? For Foundry that splits into five tests. Does every production dependency sit on a GA feature, or on a preview someone has approved in writing? Does every caller authenticate with Microsoft Entra ID and the narrowest role? Is there an evaluation result the business accepted, plus a gate that stops a worse version shipping? Can the team see a bad answer, roll back and pay the bill? Do the region, quota and network choices hold under the expected load?</p>
+<p>The new Foundry portal is GA for core scenarios in Foundry projects. It is not GA everywhere. Monitoring, agent guardrails, memory, Voice Live and Operate are still preview. Workflows retire on 1 December 2026. A review that does not check the feature readiness table is not a review.</p>
+<h2 id="the-decision">The decision</h2>
+<p>The first call is what the app is allowed to depend on. Each row is a trade-off the client must choose, not one you choose for them.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Decision</th><th>Option A</th><th>Option B</th><th>What tips it</th></tr></thead><tbody><tr><td>Preview features</td><td>GA only in production</td><td>Named previews approved for production</td><td>Learn's position: preview has no SLA and is not recommended for production. Monitoring being preview is the common forcing case.</td></tr><tr><td>Authentication</td><td>Entra ID with RBAC everywhere, keys disabled</td><td>Keys for some callers</td><td>Evaluations, datasets, Content Understanding, agents and workflows require Entra ID anyway. Keys lack role granularity.</td></tr><tr><td>Agent type</td><td>Prompt agent</td><td>Hosted agent</td><td>Custom code, framework or protocol needs push to hosted; hosted adds a container, registry and deployment pipeline.</td></tr><tr><td>Release model</td><td>Endpoint follows latest version</td><td>Production pinned to a version, promoted after a gate</td><td>Pinning costs a release step; following latest lets a deploy change production before tests run.</td></tr><tr><td>Network</td><td>Public endpoints with Entra ID</td><td>Private endpoints and network isolation</td><td>Some GA features, including traces, do not fully support network isolation. Hosted agents get a private registry only on projects created after 25 June 2026.</td></tr><tr><td>Model capacity</td><td>Standard or Global Standard deployments</td><td>Provisioned throughput</td><td>Predictable latency at volume against paying for reserved capacity.</td></tr><tr><td>Region</td><td>One region</td><td>Two regions</td><td>Model and feature availability differ by region; a second region is a cost and a test burden.</td></tr></tbody></table>
+<h2 id="reference-design">Reference design</h2>
+<p>Harbour Goods' support agent is the worked case: a grounded agent behind a web app, voice later, six stores, support hours 9 AM to 9 PM IST.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Component</th><th>Job in production</th><th>Evidence the review asks for</th></tr></thead><tbody><tr><td>Foundry resource and project, per environment</td><td>Holds models, agents, connections and RBAC</td><td>Bicep or Terraform in source control; dev and prod are separate projects.</td></tr><tr><td>Model deployments</td><td>Serve the agent's model with known quota</td><td>Deployment type, TPM capacity, model version and its retirement date.</td></tr><tr><td>Agent (prompt or hosted), versioned</td><td>The behaviour customers meet</td><td>The production version number and how it was promoted.</td></tr><tr><td>Knowledge: file search or Azure AI Search</td><td>Grounds answers in approved documents</td><td>Source owner, refresh process, citation shown to users.</td></tr><tr><td>Guardrails and content filters</td><td>Block harmful input and output</td><td>Filter configuration per deployment; agent guardrails are preview.</td></tr><tr><td>App identity (managed identity)</td><td>Calls the project without secrets</td><td>Role assignments at project scope; no keys in app settings.</td></tr><tr><td>Evaluation suite (<code>eval.yaml</code> plus a fixed test set)</td><td>Measures quality and blocks regressions</td><td>Last run results and the threshold the business accepted.</td></tr><tr><td>CI/CD pipeline</td><td>Deploys the same way every time</td><td>OIDC sign-in, approval on production, pin then promote.</td></tr><tr><td>Tracing and Application Insights</td><td>Explains a single bad answer</td><td>A trace for one real conversation, end to end.</td></tr><tr><td>Cost and quota controls</td><td>Keeps spend inside budget</td><td>Budget alerts, per-deployment TPM, file search charges understood.</td></tr><tr><td>Fallback path</td><td>What users see when Foundry is down</td><td>A tested message or a handover to a person.</td></tr></tbody></table>
+<h2 id="questions-to-ask-the-client">Questions to ask the client</h2>
+<ol>
+<li>Which answers would cause harm if wrong? Returns and warranty answers cost money; a wrong delivery promise costs trust. Name them.</li>
+<li>Who owns the policy documents? How do they tell us when one changes?</li>
+<li>Is any preview feature acceptable in production? Who signs that off? For how long?</li>
+<li>What is the accepted quality bar, in numbers? On which test set?</li>
+<li>Who can approve a release? Who can roll one back at 8 PM on a Saturday?</li>
+<li>Which regions is data allowed to be processed in? Does Data Zone or Global processing pass that rule?</li>
+<li>What volume do you expect at peak? What latency will callers tolerate?</li>
+<li>Where do conversations get stored, for how long? Who can read them?</li>
+<li>What happens when the agent cannot answer? A person, a form, a phone number?</li>
+<li>What is the monthly budget? Who gets the alert when it is close?</li>
+</ol>
+<h2 id="review-checklist">Review checklist</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Area</th><th>Check</th><th>Pass when</th></tr></thead><tbody><tr><td>Scope</td><td>Every production feature mapped to the GA readiness table</td><td>Each preview dependency has written approval and an exit plan.</td></tr><tr><td>Scope</td><td>Preview features restricted in production</td><td>Tags or custom RBAC roles from Learn's disable-preview guidance are in place.</td></tr><tr><td>Identity</td><td>No API keys in production callers</td><td><code>disableLocalAuth</code> is true, or each key caller is listed with an end date.</td></tr><tr><td>Identity</td><td>Narrowest roles</td><td>Developers hold Foundry User on the project; elevated roles are just in time.</td></tr><tr><td>Quality</td><td>Evaluation result accepted by the business</td><td>Run ID, dataset version and threshold recorded.</td></tr><tr><td>Quality</td><td>Release gate in the pipeline</td><td>A deliberately broken change was shown to fail the gate.</td></tr><tr><td>Safety</td><td>Content filters and red teaming done</td><td>Filter settings recorded; red team findings closed or accepted.</td></tr><tr><td>Release</td><td>Production pinned to a version</td><td>Endpoint routing shows one version at 100 per cent; rollback rehearsed.</td></tr><tr><td>Operations</td><td>One conversation traceable end to end</td><td>A trace from user message to tool call to answer.</td></tr><tr><td>Operations</td><td>Monitoring in place</td><td>Alerts on errors, latency and cost, knowing monitoring is preview.</td></tr><tr><td>Capacity</td><td>Quota covers peak</td><td>TPM per deployment checked against expected volume, with headroom.</td></tr><tr><td>Lifecycle</td><td>Model retirement dates known</td><td>A calendar entry before each retirement date, not after.</td></tr><tr><td>Network</td><td>Network design matches the feature list</td><td>Features that lack network isolation support are absent or accepted.</td></tr><tr><td>Region</td><td>Model and features available in the chosen region</td><td>Checked against Learn's region support page on the review date.</td></tr><tr><td>Continuity</td><td>Fallback tested</td><td>Users see a useful message when the agent is unavailable.</td></tr></tbody></table>
+<p>For a broader pass, Microsoft's Well-Architected Framework AI workload assessment is a free self-assessment over the same pillars. Run it alongside this list, not instead of it.</p>
+<h2 id="anti-patterns">Anti-patterns</h2>
+<ul>
+<li><strong>Preview by accident.</strong> A dependency nobody noticed was preview, discovered when its API changes. The usual culprits are monitoring, memory and agent guardrails.</li>
+<li><strong>Building new work on Workflows.</strong> Foundry retires Workflows on 1 December 2026. Learn's direction is Microsoft Agent Framework for new development.</li>
+<li><strong>Owner as the developer role.</strong> Owner manages resources. It does not grant agent creation, yet it grants far more than a developer needs.</li>
+<li><strong>"It answered fine in the playground."</strong> One good conversation is a demo. A fixed test set with a threshold is evidence.</li>
+<li><strong>Deploy, then test, on an unpinned endpoint.</strong> Production changed before the first test ran.</li>
+<li><strong>Keys kept "just for the website".</strong> Every unlisted key is a credential nobody rotates and nobody can scope.</li>
+<li><strong>Classic agents in a new design.</strong> Classic agents are deprecated and retire on 31 March 2027. Do not start anything new on them.</li>
+<li><strong>No owner for the documents.</strong> A grounded agent is only as current as its files. Without an owner, it is confidently out of date by next quarter.</li>
+</ul>
+<h2 id="next-on-the-roadmap">Next on the roadmap</h2>
+<p>This is Production readiness review (ship-4-1) on the <a href="/foundry-field-notes/roadmap/">roadmap</a>, the last step on the Build and ship track. The gate behind the quality rows is in <a href="/foundry-field-notes/articles/evaluation-release-gates/">Evaluation strategy that gates releases</a>. The pipeline is in <a href="/foundry-field-notes/articles/ci-cd-agents/">CI/CD for agents</a>. For the platform underneath, read <a href="/foundry-field-notes/articles/ai-landing-zone/">An AI landing zone</a> and <a href="/foundry-field-notes/articles/monitor-in-production/">Monitor in production</a>.</p>
+<h2 id="on-the-brewhouse-floor">On the brewhouse floor</h2>
+<p>A food and drink plant never starts a new line without a pre-start review: allergens declared, labels checked against the recipe, a recall drill, someone with authority to stop the line. An AI app that answers customers about a product deserves the same. Plant B's product information agent would face the same checklist with one extra row: every allergen answer is in the fixed test set. It must pass at 100 per cent. Nobody gets to accept a lower number.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/azure/foundry/concepts/general-availability">Microsoft Foundry portal general availability overview</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/disable-preview-features">Disable preview features in Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/develop/sdk-overview">Microsoft Foundry SDKs and endpoints</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/how-to/set-up-ci-cd-cli">Set up CI/CD for hosted agents with the Azure Developer CLI</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/how-to/manage-hosted-agent">Manage hosted agents</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/agents/how-to/configure-voice-agent">Configure a voice agent</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/how-to/upgrade-azure-openai">Upgrade from Azure OpenAI to Microsoft Foundry</a></li>
+<li><a href="https://learn.microsoft.com/azure/well-architected/ai/assessment">Well-Architected Framework AI workload assessment</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry-classic/agents/how-to/tools-classic/file-search-upload-files">How to upload files using the file search tool (classic)</a></li>
+</ul> <section class="author" data-astro-cid-eomsrdgo> <img src="/foundry-field-notes/ankur.jpg" alt="" width="64" height="64" data-astro-cid-eomsrdgo> <div data-astro-cid-eomsrdgo> <p class="name" data-astro-cid-eomsrdgo>Ankur Napa</p> <p data-astro-cid-eomsrdgo>Brewer turned data and AI developer in Bengaluru, certified DP-600. Writes these notes while learning Foundry in public. <a href="/foundry-field-notes/about/" data-astro-cid-eomsrdgo>About the author</a>.</p> </div> </section> </article> <aside class="side" data-astro-cid-eomsrdgo> <nav class="box" aria-label="On this page" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On this page</p> <ol data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="#short-answer" data-astro-cid-eomsrdgo>Short answer</a></li><li data-astro-cid-eomsrdgo><a href="#the-decision" data-astro-cid-eomsrdgo>The decision</a></li><li data-astro-cid-eomsrdgo><a href="#reference-design" data-astro-cid-eomsrdgo>Reference design</a></li><li data-astro-cid-eomsrdgo><a href="#questions-to-ask-the-client" data-astro-cid-eomsrdgo>Questions to ask the client</a></li><li data-astro-cid-eomsrdgo><a href="#review-checklist" data-astro-cid-eomsrdgo>Review checklist</a></li><li data-astro-cid-eomsrdgo><a href="#anti-patterns" data-astro-cid-eomsrdgo>Anti-patterns</a></li><li data-astro-cid-eomsrdgo><a href="#next-on-the-roadmap" data-astro-cid-eomsrdgo>Next on the roadmap</a></li><li data-astro-cid-eomsrdgo><a href="#on-the-brewhouse-floor" data-astro-cid-eomsrdgo>On the brewhouse floor</a></li><li data-astro-cid-eomsrdgo><a href="#sources" data-astro-cid-eomsrdgo>Sources</a></li></ol> </nav> <div class="box" data-astro-cid-eomsrdgo> <p class="meta" data-astro-cid-eomsrdgo>On the roadmap</p> <ul data-astro-cid-eomsrdgo><li data-astro-cid-eomsrdgo><a href="/foundry-field-notes/roadmap/#level-4" data-astro-cid-eomsrdgo>Level 4: Production readiness review</a></li></ul> </div>  </aside> </div> </main> <footer class="site-foot" data-astro-cid-5hce7sga> <div class="wrap cols" data-astro-cid-5hce7sga> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Follow the notes</h2> <p data-astro-cid-5hce7sga>New walkthroughs and a monthly note on what changed in Microsoft Foundry, posted on LinkedIn first.</p> <p data-astro-cid-5hce7sga><a class="btn" href="https://www.linkedin.com/in/ankur-napa" data-astro-cid-5hce7sga>Follow on LinkedIn</a></p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://github.com/AnkurNapa" data-astro-cid-5hce7sga>GitHub</a></li> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/" data-astro-cid-5hce7sga>Blog: beer, wine, whisky and AI</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Sister sites</h2> <p data-astro-cid-5hce7sga>The same roadmap format for the rest of the data stack.</p> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/fabric-field-notes/" data-astro-cid-5hce7sga>Fabric Field Notes</a></li><li data-astro-cid-5hce7sga><a href="https://ankurnapa.github.io/tableau-field-notes/" data-astro-cid-5hce7sga>Tableau Field Notes</a></li> </ul> </section> <section data-astro-cid-5hce7sga> <h2 data-astro-cid-5hce7sga>Tools and more</h2> <ul class="next" data-astro-cid-5hce7sga> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/cost-calculator/" data-astro-cid-5hce7sga>Token cost calculator</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/people/" data-astro-cid-5hce7sga>Official Foundry resources</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/beverage/" data-astro-cid-5hce7sga>Foundry in beer, whisky, wine and food</a></li> <li data-astro-cid-5hce7sga><a href="/foundry-field-notes/search/" data-astro-cid-5hce7sga>Search the site</a></li> <li data-astro-cid-5hce7sga><a href="https://ai.azure.com" data-astro-cid-5hce7sga>Open the Foundry portal</a></li> </ul> </section> </div> <div class="legal" data-astro-cid-5hce7sga> <div class="wrap" data-astro-cid-5hce7sga> <p data-astro-cid-5hce7sga>Written by Ankur Napa for everyone learning Microsoft Foundry.</p> <p data-astro-cid-5hce7sga>Independent community site. Not affiliated with or endorsed by Microsoft. Microsoft Foundry is a trademark of Microsoft Corporation.</p> </div> </div> </footer> <script type="module">const a=["auto","light","dark"],t=document.querySelector(".theme"),c=t?.querySelector(".theme-label"),o=()=>{try{return localStorage.getItem("ffn-theme")||"auto"}catch{return"auto"}},r=e=>{e==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=e,t&&(t.dataset.mode=e,t.setAttribute("aria-label",`Colour theme: ${e}`)),c&&(c.textContent=e[0].toUpperCase()+e.slice(1))};r(o());const n=document.querySelector(".menu-btn"),l=e=>{n?.setAttribute("aria-expanded",String(e)),n?.closest(".bar")?.classList.toggle("open",e)};n?.addEventListener("click",()=>l(n.getAttribute("aria-expanded")!=="true"));document.addEventListener("keydown",e=>{e.key==="Escape"&&l(!1)});t?.addEventListener("click",()=>{const e=a[(a.indexOf(o())+1)%a.length];try{e==="auto"?localStorage.removeItem("ffn-theme"):localStorage.setItem("ffn-theme",e)}catch{}r(e)});</script> </body></html> <script type="module">document.querySelectorAll(".body pre").forEach(e=>{const t=document.createElement("button");t.type="button",t.className="copy",t.textContent="Copy",t.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(e.innerText.replace(/Copy$/,"")),t.textContent="Copied"}catch{t.textContent="Select and copy"}setTimeout(()=>t.textContent="Copy",1600)}),e.append(t)});</script> 

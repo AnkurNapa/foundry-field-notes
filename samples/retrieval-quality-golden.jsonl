@@ -1,0 +1,20 @@
+{"qid": "q01", "question": "How many days do I have to return something?", "relevant": ["R2"]}
+{"qid": "q02", "question": "Can I send back a blender I've had for five weeks?", "relevant": ["W4", "R2"]}
+{"qid": "q03", "question": "My kettle stopped heating after two months. What can I do?", "relevant": ["W1", "W4"]}
+{"qid": "q04", "question": "I lost the bill. Can I still get my money back?", "relevant": ["R5"]}
+{"qid": "q05", "question": "When will my refund reach my UPI account?", "relevant": ["R6"]}
+{"qid": "q06", "question": "Is Jaipur a metro city for delivery?", "relevant": ["D2"]}
+{"qid": "q07", "question": "How long does delivery take to Hyderabad?", "relevant": ["D1", "D2"]}
+{"qid": "q08", "question": "What do I get if my parcel is late?", "relevant": ["D4"]}
+{"qid": "q09", "question": "Is there a fee for shipping a sofa?", "relevant": ["D3"]}
+{"qid": "q10", "question": "Can I return opened curtains made to my size?", "relevant": ["R4"]}
+{"qid": "q11", "question": "Does the warranty cover a phone I dropped in water?", "relevant": ["W3"]}
+{"qid": "q12", "question": "How much is the extended warranty on a TV?", "relevant": ["W5"]}
+{"qid": "q13", "question": "What does policy HG-POL-DEL say about tracking?", "relevant": ["D5"]}
+{"qid": "q14", "question": "How long will the store hold my pickup order?", "relevant": ["D6"]}
+{"qid": "q15", "question": "Can I return an opened laptop that works fine?", "relevant": ["R3"]}
+{"qid": "q16", "question": "What is the warranty on a sofa?", "relevant": ["W1"]}
+{"qid": "q17", "question": "Who repairs my mixer if it breaks? How long does it take?", "relevant": ["W2"]}
+{"qid": "q18", "question": "Is the INR 150 voucher valid if I gave the wrong address?", "relevant": ["D4"]}
+{"qid": "q19", "question": "How do I start a return online?", "relevant": ["R7"]}
+{"qid": "q20", "question": "Are gift cards refundable?", "relevant": ["R4"]}

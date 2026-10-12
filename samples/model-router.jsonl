@@ -1,0 +1,24 @@
+{"label": "simple", "prompt": "What are your support hours?"}
+{"label": "simple", "prompt": "Is ST-014 in Pune?"}
+{"label": "simple", "prompt": "How many days is the return window?"}
+{"label": "simple", "prompt": "Spell out the order ID format."}
+{"label": "simple", "prompt": "Translate 'thank you for your order' into Hindi."}
+{"label": "simple", "prompt": "Is Chennai a metro city for delivery?"}
+{"label": "simple", "prompt": "What is the electronics warranty length?"}
+{"label": "simple", "prompt": "Say hello to a customer named Priya."}
+{"label": "simple", "prompt": "Which store code is Delhi North?"}
+{"label": "simple", "prompt": "Give me a one-line apology for a late delivery."}
+{"label": "simple", "prompt": "Is 9 PM IST inside support hours?"}
+{"label": "simple", "prompt": "What does ST-022 stand for?"}
+{"label": "complex", "prompt": "A customer bought a fridge 29 days ago, lost the receipt but paid by card. The fridge has a dent. Draft a reply that follows policy and says what to check."}
+{"label": "complex", "prompt": "Compare our 3-day metro and 5-day non-metro promise against 120 late orders last month and propose two process fixes with trade-offs."}
+{"label": "complex", "prompt": "An order shipped from ST-019 to Kolkata was marked delivered but the customer says it never arrived. Plan the investigation steps in order."}
+{"label": "complex", "prompt": "Rewrite the returns policy for a customer who is angry, without changing any rule, in under 120 words."}
+{"label": "complex", "prompt": "Given a warranty claim at month 12 plus 3 days, explain whether goodwill is allowed under the policy text and what to escalate."}
+{"label": "complex", "prompt": "Work out the refund for two items at INR 1,499 and INR 2,350 where only the second is returnable and a INR 99 delivery fee was charged once."}
+{"label": "complex", "prompt": "A supplier invoice lists 48 units but the store received 45. Draft the email to the supplier and the note for finance."}
+{"label": "complex", "prompt": "Classify these five complaints into returns, delivery, warranty or other. Give one reason each: late parcel; broken kettle at 2 months; wrong colour; refund missing; rude courier."}
+{"label": "complex", "prompt": "Explain to a new support agent why ST-099 orders fail validation and how to fix the store code."}
+{"label": "complex", "prompt": "Design a three-question script that confirms identity before sharing order details. Say why each question is there."}
+{"label": "complex", "prompt": "A customer in Mumbai wants delivery to a relative in Nashik in 3 days. Explain what we can promise and what we cannot."}
+{"label": "complex", "prompt": "Summarise the trade-off between refunding immediately and waiting for the returned item to arrive, for a INR 25,000 TV."}
